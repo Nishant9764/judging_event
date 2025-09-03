@@ -9,9 +9,16 @@ const studentProgressBar = document.getElementById("student-progress-bar");
 const studentProgressText = document.getElementById("student-progress-text");
 const scoringPanel = document.getElementById("scoring-panel");
 
-let currentEvent = null;
-let currentStudent = null;
+let currentEvent = null; // { id, title, roomNumber, parameters:[], students:[] }
+let currentStudent = null; // reference to object inside currentEvent.students
 let livePollingInterval = null;
+
+/* ---------- Helpers ---------- */
+
+function genStudentId(s, idx) {
+  // stable unique id fallback: use unique_id if present otherwise fall back to index-based synthetic id
+  return s.unique_id || s.id || s.uniqueId || `__stu_idx_${idx}`;
+}
 
 async function safeFetchJson(url, opts) {
   const res = await fetch(url, opts);
@@ -33,7 +40,8 @@ async function safeFetchJson(url, opts) {
   }
 }
 
-// Start scoring for selected event and room
+/* ---------- Start Scoring & Polling ---------- */
+
 async function startScoringByEvent(eventId, eventName, roomNumber) {
   try {
     // fetch parameters
@@ -41,7 +49,7 @@ async function startScoringByEvent(eventId, eventName, roomNumber) {
       `/api/parameters/${encodeURIComponent(eventName)}`
     );
 
-    // fetch students by room + event
+    // fetch students by room+event if roomNumber provided, fallback to event-only
     let students = [];
     if (roomNumber) {
       students = await safeFetchJson(
@@ -55,19 +63,19 @@ async function startScoringByEvent(eventId, eventName, roomNumber) {
       );
     }
 
-    // normalize students
-    const normalized = (students || []).map((s) => ({
-      unique_id: s.unique_id || s.id || s.uniqueId,
+    // normalize students and ensure stable unique ids
+    const normalized = (students || []).map((s, idx) => ({
+      unique_id: genStudentId(s, idx),
       name: s.name || s.NAME || s.student_name || "Unknown",
-      scored: false,
-      scores: {},
+      scored: !!(s.scored || false),
+      scores: s.scores || {},
       comments: s.comments || "",
     }));
 
     currentEvent = {
       id: eventId,
       title: eventName,
-      roomNumber: roomNumber,
+      roomNumber: roomNumber || null,
       parameters: (params || []).map((p) => ({
         parameter_id: p.parameter_id,
         parameter_name: p.parameter_name,
@@ -83,14 +91,16 @@ async function startScoringByEvent(eventId, eventName, roomNumber) {
     scoringView.classList.remove("hidden");
 
     populateStudentList();
+
     const firstUnscored = currentEvent.students.find((s) => !s.scored);
-    if (firstUnscored) renderScoringPanel(firstUnscored.unique_id);
-    else if (currentEvent.students.length)
-      renderScoringPanel(currentEvent.students[0].unique_id);
+    const toOpen = firstUnscored
+      ? firstUnscored.unique_id
+      : currentEvent.students[0] && currentEvent.students[0].unique_id;
+    if (toOpen) renderScoringPanel(toOpen);
     else
       scoringPanel.innerHTML = `<div class="text-center p-12 text-gray-500"><p>No students assigned to this room/event yet.</p></div>`;
 
-    // start live polling
+    // start live polling every 3 seconds (restart interval cleanly)
     if (livePollingInterval) clearInterval(livePollingInterval);
     livePollingInterval = setInterval(pollStudentsAndParameters, 3000);
   } catch (err) {
@@ -99,33 +109,34 @@ async function startScoringByEvent(eventId, eventName, roomNumber) {
   }
 }
 
-// Live polling function
 async function pollStudentsAndParameters() {
   if (!currentEvent) return;
   try {
-    // refresh students with room + event validation
-    let students = [];
+    // students: prefer room+event endpoint for exact validation
+    let studentsRaw = [];
     if (currentEvent.roomNumber) {
-      students = await safeFetchJson(
+      studentsRaw = await safeFetchJson(
         `/api/students-by-room-event/${encodeURIComponent(
           currentEvent.roomNumber
         )}/${encodeURIComponent(currentEvent.title)}`
       );
     } else {
-      students = await safeFetchJson(
+      studentsRaw = await safeFetchJson(
         `/api/students/${encodeURIComponent(currentEvent.title)}`
       );
     }
 
-    const normalized = (students || []).map((s) => {
-      const existing = currentEvent.students.find(
-        (st) => st.unique_id === s.unique_id
+    // normalize but preserve scored/scores/comments for existing students by unique_id
+    const normalized = (studentsRaw || []).map((s, idx) => {
+      const uid = genStudentId(s, idx);
+      const existing = (currentEvent.students || []).find(
+        (x) => x.unique_id === uid
       );
       return {
-        unique_id: s.unique_id || s.id || s.uniqueId,
-        name: s.name || s.NAME || s.student_name || "Unknown",
+        unique_id: uid,
+        name: s.name || s.NAME || s.student_name || existing?.name || "Unknown",
         scored: existing?.scored || false,
-        scores: existing?.scores || {},
+        scores: existing?.scores ? { ...existing.scores } : {},
         comments: existing?.comments || "",
       };
     });
@@ -133,24 +144,47 @@ async function pollStudentsAndParameters() {
     currentEvent.students = normalized;
     populateStudentList();
 
-    // refresh parameters
-    const params = await safeFetchJson(
+    // parameters: refresh (admin might add a parameter)
+    const paramsRaw = await safeFetchJson(
       `/api/parameters/${encodeURIComponent(currentEvent.title)}`
     );
-    currentEvent.parameters = (params || []).map((p) => ({
+    const normalizedParams = (paramsRaw || []).map((p) => ({
       parameter_id: p.parameter_id,
       parameter_name: p.parameter_name,
       max_score: Number(p.max_score || 10),
     }));
 
-    // re-render panel if needed
-    if (currentStudent) renderScoringPanel(currentStudent.unique_id);
+    // update only if changed (simple stringify check)
+    if (
+      JSON.stringify(normalizedParams) !==
+      JSON.stringify(currentEvent.parameters || [])
+    ) {
+      currentEvent.parameters = normalizedParams;
+    }
+
+    // re-render current student's panel to reflect any parameter or student changes
+    if (currentStudent && currentStudent.unique_id) {
+      const stillExists = currentEvent.students.find(
+        (s) => s.unique_id === currentStudent.unique_id
+      );
+      if (stillExists) {
+        renderScoringPanel(currentStudent.unique_id);
+      } else {
+        // current student removed — open first available
+        const first = currentEvent.students[0];
+        if (first) renderScoringPanel(first.unique_id);
+        else
+          scoringPanel.innerHTML = `<div class="text-center p-12 text-gray-500"><p>No students assigned.</p></div>`;
+      }
+    }
   } catch (err) {
-    console.warn("Live poll failed", err.message);
+    // don't blow up polling if a single request fails
+    console.warn("pollStudentsAndParameters failed:", err?.message || err);
   }
 }
 
-// Populate student list sidebar
+/* ---------- Render Sidebar ---------- */
+
 function populateStudentList() {
   studentListUl.innerHTML = "";
   if (!currentEvent) return;
@@ -159,20 +193,28 @@ function populateStudentList() {
 
   students.forEach((s) => {
     const li = document.createElement("li");
+
+    // button container
     const btn = document.createElement("button");
     btn.className =
       "w-full text-left flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 transition-colors";
-    btn.dataset.studentId = s.unique_id; // capture studentId properly
-    btn.innerHTML =
-      `<span class="flex items-center gap-3"><i data-feather="user" class="w-5 h-5 text-gray-500"></i><span class="font-medium">${s.name}</span></span>` +
-      (s.scored
-        ? '<i data-feather="check-circle" class="w-5 h-5 text-green-500"></i>'
-        : "");
+    btn.dataset.studentId = s.unique_id;
 
-    // Correct binding using dataset
-    btn.addEventListener("click", (e) => {
-      const sid = e.currentTarget.dataset.studentId;
-      renderScoringPanel(sid);
+    const left = document.createElement("span");
+    left.className = "flex items-center gap-3";
+    left.innerHTML = `<i data-feather="user" class="w-5 h-5 text-gray-500"></i><span class="font-medium">${s.name}</span>`;
+
+    const right = document.createElement("span");
+    right.innerHTML = s.scored
+      ? '<i data-feather="check-circle" class="w-5 h-5 text-green-500"></i>'
+      : "";
+
+    btn.appendChild(left);
+    btn.appendChild(right);
+
+    btn.addEventListener("click", () => {
+      // render the panel for this studentId (always lookup latest object by id)
+      renderScoringPanel(btn.dataset.studentId);
     });
 
     li.appendChild(btn);
@@ -183,96 +225,208 @@ function populateStudentList() {
   feather.replace();
 }
 
-// Render scoring panel
+/* ---------- Render Scoring Panel (DOM-based, safe listeners) ---------- */
+
 function renderScoringPanel(studentUniqueId) {
+  if (!currentEvent) return;
   const student = currentEvent.students.find(
-    (x) => x.unique_id === studentUniqueId
+    (s) => s.unique_id === studentUniqueId
   );
   if (!student) return;
+
+  // set current student reference to object in the students array
   currentStudent = student;
 
-  let totalInitial = 0;
-  const paramHtml = currentEvent.parameters
-    .map((p) => {
-      const pid = p.parameter_id;
-      const existing = Number(student.scores?.[pid] || 0);
-      totalInitial += existing;
-      return `
-      <div>
-        <div class="flex justify-between items-center mb-2">
-          <label class="font-semibold">${p.parameter_name}</label>
-          <span class="font-bold"><span id="param-${pid}-value">${existing}</span> / ${p.max_score}</span>
-        </div>
-        <input type="range" data-parameter-id="${pid}" min="0" max="${p.max_score}" value="${existing}" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer param-range">
-      </div>`;
-    })
-    .join("\n");
+  // Clear scoringPanel and build elements (avoid innerHTML string)
+  scoringPanel.innerHTML = "";
 
-  scoringPanel.innerHTML = `
-    <div class="flex justify-between items-start mb-6">
-      <div>
-        <h3 class="text-xl font-bold">Scoring: ${student.name}</h3>
-      </div>
-      <div class="text-right">
-        <p id="total-score" class="text-3xl font-bold">${totalInitial}</p>
-        <p class="text-gray-500">Total Score</p>
-      </div>
-    </div>
+  // Header block (title + total)
+  const header = document.createElement("div");
+  header.className = "flex justify-between items-start mb-6";
 
-    <div class="space-y-6">${paramHtml}</div>
+  const left = document.createElement("div");
+  left.innerHTML = `<h3 class="text-xl font-bold">Scoring: ${student.name}</h3>`;
+  header.appendChild(left);
 
-    <div class="mt-8">
-      <label for="comments" class="font-semibold">Additional Comments (Optional)</label>
-      <textarea id="comments" rows="4" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg">${
-        student.comments || ""
-      }</textarea>
-    </div>
+  const right = document.createElement("div");
+  right.className = "text-right";
+  const totalScoreEl = document.createElement("p");
+  totalScoreEl.id = "total-score";
+  totalScoreEl.className = "text-3xl font-bold";
+  // calculate initial total
+  const initialTotal = currentEvent.parameters.reduce(
+    (acc, p) => acc + Number(student.scores?.[p.parameter_id] || 0),
+    0
+  );
+  totalScoreEl.textContent = String(initialTotal);
+  right.appendChild(totalScoreEl);
+  const totalLabel = document.createElement("p");
+  totalLabel.className = "text-gray-500";
+  totalLabel.textContent = "Total Score";
+  right.appendChild(totalLabel);
 
-    <div class="mt-8 pt-6 border-t border-gray-200 flex items-center justify-end gap-4">
-      <button id="skip-button" class="font-semibold text-gray-600 hover:text-gray-900 transition-colors">Skip</button>
-      <button id="submit-button" class="bg-gray-800 text-white font-semibold py-3 px-6 rounded-lg hover:bg-gray-900 transition-colors flex items-center gap-2">
-        <i data-feather="check" class="w-5 h-5"></i>
-        Submit Score
-      </button>
-    </div>
-  `;
+  header.appendChild(right);
+  scoringPanel.appendChild(header);
 
-  scoringPanel.querySelectorAll(".param-range").forEach((inp) => {
-    inp.addEventListener("input", (e) => {
+  // Parameters container
+  const paramsContainer = document.createElement("div");
+  paramsContainer.className = "space-y-6";
+
+  currentEvent.parameters.forEach((p) => {
+    const paramRow = document.createElement("div");
+
+    // label row
+    const labelRow = document.createElement("div");
+    labelRow.className = "flex justify-between items-center mb-2";
+
+    const label = document.createElement("label");
+    label.className = "font-semibold";
+    label.textContent = p.parameter_name;
+
+    const valueSpan = document.createElement("span");
+    valueSpan.className = "font-bold";
+    const valueNum = document.createElement("span");
+    // unique display id to avoid collisions
+    const displayId = `param-${student.unique_id}-${p.parameter_id}-value`;
+    valueNum.id = displayId;
+    const existing = Number(student.scores?.[p.parameter_id] || 0);
+    valueNum.textContent = String(existing);
+    valueSpan.appendChild(valueNum);
+    valueSpan.insertAdjacentHTML("beforeend", ` / ${p.max_score}`);
+
+    labelRow.appendChild(label);
+    labelRow.appendChild(valueSpan);
+
+    // input range
+    const input = document.createElement("input");
+    input.type = "range";
+    input.min = "0";
+    input.max = String(p.max_score);
+    input.value = String(existing);
+    input.step = "1";
+    input.className =
+      "w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer param-range";
+    // store parameter id and student id on element
+    input.dataset.parameterId = String(p.parameter_id);
+    input.dataset.studentId = student.unique_id;
+
+    // input event: write to student's scores and update total display
+    input.addEventListener("input", (e) => {
       const pid = e.target.dataset.parameterId;
+      const sid = e.target.dataset.studentId;
       const val = Number(e.target.value);
-      const disp = document.getElementById(`param-${pid}-value`);
-      if (disp) disp.textContent = val;
-      if (!currentStudent.scores) currentStudent.scores = {};
-      currentStudent.scores[pid] = val;
 
+      // find student object (fresh) by sid
+      const st = currentEvent.students.find((x) => x.unique_id === sid);
+      if (!st) return;
+      if (!st.scores) st.scores = {};
+      st.scores[pid] = val;
+
+      // update display
+      const disp = document.getElementById(`param-${sid}-${pid}-value`);
+      if (disp) disp.textContent = String(val);
+
+      // recompute total
       const total = currentEvent.parameters.reduce(
-        (acc, p) => acc + Number(currentStudent.scores[p.parameter_id] || 0),
+        (acc, pr) => acc + Number(st.scores?.[pr.parameter_id] || 0),
         0
       );
       const totalEl = document.getElementById("total-score");
-      if (totalEl) totalEl.textContent = total;
+      if (totalEl) totalEl.textContent = String(total);
     });
+
+    paramRow.appendChild(labelRow);
+    paramRow.appendChild(input);
+    paramsContainer.appendChild(paramRow);
   });
 
-  scoringPanel
-    .querySelector("#submit-button")
-    .addEventListener("click", handleSubmitScore);
-  scoringPanel
-    .querySelector("#skip-button")
-    .addEventListener("click", handleSkipStudent);
-  scoringPanel
-    .querySelector("#comments")
-    .addEventListener(
-      "input",
-      (e) => (currentStudent.comments = e.target.value)
-    );
+  scoringPanel.appendChild(paramsContainer);
 
+  // Comments box
+  const commentsDiv = document.createElement("div");
+  commentsDiv.className = "mt-8";
+  const commentsLabel = document.createElement("label");
+  commentsLabel.className = "font-semibold";
+  commentsLabel.htmlFor = `comments-${student.unique_id}`;
+  commentsLabel.textContent = "Additional Comments (Optional)";
+  const commentsTextarea = document.createElement("textarea");
+  commentsTextarea.id = `comments-${student.unique_id}`;
+  commentsTextarea.rows = 4;
+  commentsTextarea.className =
+    "w-full p-3 bg-gray-50 border border-gray-200 rounded-lg";
+  commentsTextarea.value = student.comments || "";
+  commentsTextarea.addEventListener("input", (e) => {
+    // update student comment on input
+    const st = currentEvent.students.find(
+      (x) => x.unique_id === student.unique_id
+    );
+    if (!st) return;
+    st.comments = e.target.value;
+  });
+  commentsDiv.appendChild(commentsLabel);
+  commentsDiv.appendChild(document.createElement("br"));
+  commentsDiv.appendChild(commentsTextarea);
+  scoringPanel.appendChild(commentsDiv);
+
+  // Footer actions (skip + submit)
+  const footer = document.createElement("div");
+  footer.className =
+    "mt-8 pt-6 border-t border-gray-200 flex items-center justify-end gap-4";
+
+  const skipBtn = document.createElement("button");
+  skipBtn.id = "skip-button";
+  skipBtn.className =
+    "font-semibold text-gray-600 hover:text-gray-900 transition-colors";
+  skipBtn.textContent = "Skip";
+  skipBtn.addEventListener("click", () => {
+    // find index of current student and navigate to next
+    const idx = currentEvent.students.findIndex(
+      (x) => x.unique_id === student.unique_id
+    );
+    const next = currentEvent.students[idx + 1];
+    if (next) renderScoringPanel(next.unique_id);
+    else showDashboard();
+  });
+
+  const submitBtn = document.createElement("button");
+  submitBtn.id = "submit-button";
+  submitBtn.className =
+    "bg-gray-800 text-white font-semibold py-3 px-6 rounded-lg hover:bg-gray-900 transition-colors flex items-center gap-2";
+  submitBtn.innerHTML = `<i data-feather="check" class="w-5 h-5"></i><span>Submit Score</span>`;
+  submitBtn.addEventListener("click", () => {
+    // mark scored and move next (you can replace this with POST to persist)
+    const st = currentEvent.students.find(
+      (x) => x.unique_id === student.unique_id
+    );
+    if (!st) return;
+    st.scored = true;
+
+    // update UI list
+    populateStudentList();
+
+    // move to next student
+    const idx = currentEvent.students.findIndex(
+      (x) => x.unique_id === student.unique_id
+    );
+    const next = currentEvent.students[idx + 1];
+    if (next) renderScoringPanel(next.unique_id);
+    else {
+      alert("Completed scoring for this room.");
+      showDashboard();
+    }
+  });
+
+  footer.appendChild(skipBtn);
+  footer.appendChild(submitBtn);
+  scoringPanel.appendChild(footer);
+
+  // highlight active student in sidebar
   updateStudentListActiveState();
   feather.replace();
 }
 
-// Update sidebar active state
+/* ---------- Utility UI helpers ---------- */
+
 function updateStudentListActiveState() {
   studentListUl.querySelectorAll("button").forEach((btn) => {
     btn.classList.remove("bg-gray-200");
@@ -282,7 +436,6 @@ function updateStudentListActiveState() {
   });
 }
 
-// Update progress bar
 function updateStudentProgress() {
   if (!currentEvent) return;
   const total = currentEvent.students.length;
@@ -293,58 +446,34 @@ function updateStudentProgress() {
   studentListHeader.textContent = `Students (${total})`;
 }
 
-// Skip student
-function handleSkipStudent() {
-  const idx = currentEvent.students.findIndex(
-    (s) => s.unique_id === currentStudent.unique_id
-  );
-  const next = currentEvent.students[idx + 1];
-  if (next) renderScoringPanel(next.unique_id);
-  else showDashboard();
-}
-
-// Submit score locally (we'll wire POST later)
-function handleSubmitScore() {
-  if (!currentStudent) return;
-  currentStudent.scored = true;
-  updateStudentProgress();
-  populateStudentList();
-
-  const idx = currentEvent.students.findIndex(
-    (s) => s.unique_id === currentStudent.unique_id
-  );
-  const next = currentEvent.students[idx + 1];
-  if (next) renderScoringPanel(next.unique_id);
-  else {
-    alert("Completed scoring for this room.");
-    showDashboard();
-  }
-}
-
 function showDashboard() {
   dashboardView.classList.remove("hidden");
   scoringView.classList.add("hidden");
   currentEvent = null;
   currentStudent = null;
-  if (livePollingInterval) clearInterval(livePollingInterval);
+  if (livePollingInterval) {
+    clearInterval(livePollingInterval);
+    livePollingInterval = null;
+  }
 }
 
-// Event listeners
+/* ---------- Wire up dashboard buttons + stats poll ---------- */
+
 document.addEventListener("DOMContentLoaded", () => {
   feather.replace();
 
   document
     .querySelectorAll("#dashboard-view [data-event-id]")
     .forEach((btn) => {
-      btn.addEventListener("click", (e) => {
+      btn.addEventListener("click", () => {
         const eventId = btn.dataset.eventId;
         const eventName = btn.dataset.eventName;
-        const roomNumber = btn.dataset.roomNumber || btn.dataset.room; // try both attributes
+        const roomNumber = btn.dataset.roomNumber || btn.dataset.room || null;
         startScoringByEvent(eventId, eventName, roomNumber);
       });
     });
 
-  // poll stats every 5 seconds
+  // poll stats every 5 seconds (unchanged)
   setInterval(async () => {
     try {
       const res = await fetch("/judge/stats");
