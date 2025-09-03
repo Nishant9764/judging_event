@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/CSS/admin.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <!-- Sidebar Navigation -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <h1 class="sidebar-title">ISKCON NRJD Nandotsav</h1>
+          <p class="sidebar-subtitle">Administrator Panel</p>
+        </div>
+        <nav class="sidebar-nav">
+          <ul>
+            <li>
+              <a href="#" class="nav-link active" data-view="overview"
+                >Overview</a
+              >
+            </li>
+            <!-- <li><a href="#" class="nav-link" data-view="schools">Schools</a></li>
+                    <li><a href="#" class="nav-link" data-view="events">Events</a></li>
+                    <li><a href="#" class="nav-link" data-view="judges">Judges</a></li> -->
+            <li>
+              <a href="#" class="nav-link" data-view="students">Students</a>
+            </li>
+            <li>
+              <a href="#" class="nav-link" data-view="assignments"
+                >Create Room/ Judge Assignments</a
+              >
+            </li>
+            <li>
+              <a href="#" class="nav-link" data-view="scores">Leaderboard</a>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="main-content">
+        <header class="header">
+          <div class="user-info">
+            <div class="user-details">
+              <p class="user-name">Admin</p>
+            </div>
+            <form method="post" action="/logout">
+              <button class="logout-btn">Logout</button>
+            </form>
+          </div>
+        </header>
+
+        <!-- Overview Section -->
+        <section id="overview" class="view active">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <h4>Total Schools</h4>
+              <p><%= stats.schools %></p>
+            </div>
+            <div class="stat-card">
+              <h4>Events</h4>
+              <p><%= stats.events %></p>
+            </div>
+            <div class="stat-card">
+              <h4>Students</h4>
+              <p><%= stats.students %></p>
+            </div>
+          </div>
+          <div class="content-card">
+            <div class="dashboard-grid">
+              <div class="dashboard-container">
+                <!-- Left stats (three small cards) -->
+                <div class="overview-card card">
+                  <h3>Rooms Overview</h3>
+                  <div class="stat-line">
+                    <div>Total Rooms</div>
+                    <div id="totalRooms">0</div>
+                  </div>
+                  <div class="stat-line">
+                    <div>Open Rooms</div>
+                    <div id="openRooms">0</div>
+                  </div>
+                  <div class="stat-line">
+                    <div>Closed Rooms</div>
+                    <div id="closedRooms">0</div>
+                  </div>
+                </div>
+
+                <div class="overview-card card">
+                  <h3>Judges Overview</h3>
+                  <div class="stat-line">
+                    <div>Total Judges</div>
+                    <div id="totalJudges">0</div>
+                  </div>
+                  <div class="stat-line">
+                    <div>Assigned</div>
+                    <div id="assignedJudges">0</div>
+                  </div>
+                  <div class="stat-line">
+                    <div>Completed</div>
+                    <div id="completedJudges">0</div>
+                  </div>
+                </div>
+
+                <!-- Main details -->
+                <div class="details-card card">
+                  <h3>Room Assignments</h3>
+                  <div id="roomDetailsContainer"></div>
+                </div>
+
+                <!-- Alerts full width -->
+                <div class="alert-card card">
+                  <h3>Notifications</h3>
+                  <div id="dashboardAlerts">
+                    <p class="muted">Loading...</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- STUDENT MANAGEMENT -->
+        <section id="students" class="view">
+          <div class="view-header">
+            <div>
+              <h2>Student Management</h2>
+              <p>Manage student registrations for events</p>
+            </div>
+            <div class="search-container">
+              <input
+                type="search"
+                id="studentSearchInput"
+                placeholder="Search students..."
+              />
+            </div>
+          </div>
+          <div class="content-card">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>SCHOOL</th>
+                  <th>GROUP_ID</th>
+                  <th>EVENT</th>
+                  <th>CLASS</th>
+                  <th>SEC</th>
+                  <th>NAME</th>
+                  <th>Room</th>
+                  <th>Unique ID</th>
+                  <th>Select</th>
+                </tr>
+              </thead>
+
+              <tbody id="studentTableBody">
+                <% students.forEach(student => { %>
+                <tr data-event="<%= student.EVENT %>">
+                  <td><%= student.SCHOOL %></td>
+                  <td><%= student.GROUP_ID %></td>
+                  <td><%= student.EVENT %></td>
+                  <td><%= student.CLASS %></td>
+                  <td><%= student.SEC %></td>
+                  <td><%= student.NAME %></td>
+                  <td>
+                    <div class="room-assignment-cell">
+                      <input type="text" class="room-input" placeholder="Not
+                      assigned" value="<%= student.room || '' %>" <%=
+                      student.room ? 'readonly' : '' %> />
+                      <button
+                        class="btn btn-assign <%= student.room ? 'assigned' : '' %>"
+                        data-studentname="<%= student.NAME %>"
+                      >
+                        <%= student.room ? 'Assigned' : 'Assign' %>
+                      </button>
+                    </div>
+                  </td>
+                  <td class="unique-id-cell"><%= student.unique_id || '' %></td>
+                  <td>
+                    <input type="checkbox" class="student-checkbox"
+                    data-student-name="<%= student.NAME %>" <%=
+                    student.is_selected ? 'checked' : '' %> />
+                  </td>
+                </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Assignments Section -->
+        <section id="assignments" class="view">
+          <div class="view-header">
+            <div>
+              <h2>Judge Assignments / Room Creation</h2>
+              <p>Assign events to judges and create rooms</p>
+            </div>
+          </div>
+
+          <!-- Create Room -->
+          <div class="content-card">
+            <h3>Create Room</h3>
+            <form
+              id="createRoomForm"
+              class="assignment-form"
+              style="
+                display: flex;
+                gap: 25px;
+                align-items: flex-end;
+                flex-wrap: wrap;
+              "
+            >
+              <div
+                style="display: flex; flex-direction: column; min-width: 220px"
+              >
+                <label
+                  for="roomNumber"
+                  style="font-weight: bold; margin-bottom: 6px"
+                  >Room Number/Name</label
+                >
+                <input
+                  type="text"
+                  name="roomNumber"
+                  id="roomNumber"
+                  placeholder="Enter Room Number/Name..."
+                  style="padding: 8px"
+                />
+              </div>
+              <div
+                style="display: flex; flex-direction: column; min-width: 220px"
+              >
+                <label
+                  for="eventName"
+                  style="font-weight: bold; margin-bottom: 6px"
+                  >Event Name</label
+                >
+                <input
+                  type="text"
+                  name="eventName"
+                  id="eventName"
+                  placeholder="Enter Event Name..."
+                  style="padding: 8px"
+                />
+              </div>
+              <button type="submit" class="btn">Create Room</button>
+            </form>
+            <!-- Notification container at top -->
+            <div
+              id="notification-container"
+              style="position: fixed; top: 20px; right: 20px; z-index: 9999"
+            ></div>
+          </div>
+
+          <!-- Assign Room -->
+          <div class="content-card">
+            <h3>Assign Room to Judges</h3>
+            <form
+              id="assignRoomForm"
+              class="assignment-form"
+              style="
+                display: flex;
+                gap: 25px;
+                align-items: flex-end;
+                flex-wrap: wrap;
+              "
+            >
+              <div
+                style="display: flex; flex-direction: column; min-width: 220px"
+              >
+                <label
+                  for="judgeName"
+                  style="font-weight: bold; margin-bottom: 6px"
+                  >Judge Name</label
+                >
+                <input
+                  type="text"
+                  name="judgeName"
+                  id="judgeName"
+                  placeholder="Enter Judge Name..."
+                  style="padding: 8px"
+                />
+              </div>
+              <div
+                style="display: flex; flex-direction: column; min-width: 220px"
+              >
+                <label
+                  for="roomNo"
+                  style="font-weight: bold; margin-bottom: 6px"
+                  >Room Number</label
+                >
+                <input
+                  type="text"
+                  name="roomNo"
+                  id="roomNo"
+                  placeholder="Enter Room Number..."
+                  style="padding: 8px"
+                />
+              </div>
+              <button type="submit" class="btn">Assign Room</button>
+            </form>
+
+            <div
+              id="notification-container1"
+              class="notification-container1"
+            ></div>
+
+            <div
+              id="credentials-card"
+              class="credentials-card"
+              style="display: none"
+            >
+              <h4>Judge Credentials</h4>
+              <p><b>Username:</b> <span id="cred-username"></span></p>
+              <p><b>Password:</b> <span id="cred-password"></span></p>
+            </div>
+
+            <div
+              id="credentialsOutput"
+              style="
+                margin-top: 15px;
+                padding: 10px;
+                border: 1px solid #ccc;
+                display: none;
+              "
+            ></div>
+          </div>
+
+          <div class="alert-card card">
+            <h3>Notifications</h3>
+            <div id="dashboardAlerts1">
+              <p class="muted">Loading...</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Scores Section -->
+        <section id="scores" class="view">
+          <div class="view-header">
+            <div>
+              <h2>Scores & Ranks</h2>
+              <p class="small-muted">View scores and ranks of the students</p>
+            </div>
+
+            <!-- Filters: event, group, top N, manual refresh -->
+            <div class="filters">
+              <label for="eventFilter">Filter by Event:</label>
+              <select id="eventFilter" class="filter-select">
+                <option value="">All Events</option>
+              </select>
+
+              <label for="groupFilter">Filter by Group:</label>
+              <select id="groupFilter" class="filter-select">
+                <option value="">All Groups</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Stats -->
+          <div class="stats-grid" role="region" aria-label="Summary statistics">
+            <div class="stat-card">
+              <h4>Total Students</h4>
+              <p id="total-students">
+                <%= (stats && stats.total_students) ? stats.total_students : 0
+                %>
+              </p>
+            </div>
+
+            <div class="stat-card">
+              <h4>Judged</h4>
+              <p id="judged-students">
+                <%= (stats && stats.judged_students) ? stats.judged_students : 0
+                %>
+              </p>
+            </div>
+
+            <div class="stat-card">
+              <h4>Completion</h4>
+              <p id="completion">
+                <%= (stats && typeof stats.completion_pct !== 'undefined') ?
+                stats.completion_pct + '%' : '0%' %>
+              </p>
+            </div>
+          </div>
+
+          <!-- Detailed Results -->
+          <div class="content-card" role="region" aria-label="Detailed results">
+            <h3>Detailed Results</h3>
+            <table class="data-table" aria-describedby="results-desc">
+              <caption id="results-desc" class="small-muted">
+                Ranked final scores per student (final score = sum of event
+                parameters)
+              </caption>
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Student</th>
+                  <th>School</th>
+                  <th>Event</th>
+                  <th>Group</th>
+                  <th>Unique ID</th>
+                  <th>Final Score</th>
+                </tr>
+              </thead>
+              <tbody id="leaderboardBody">
+                <% if (typeof results !== 'undefined' && Array.isArray(results)
+                && results.length) { %> <% results.forEach(function(r){ %>
+                <tr>
+                  <td>#<%= r.rank ?? '-' %></td>
+                  <td><%= r.student_name ?? '-' %></td>
+                  <td><%= r.school_name ?? '-' %></td>
+                  <td><%= r.event_name ?? '-' %></td>
+                  <td><%= r.group_id ?? '-' %></td>
+                  <td><%= r.unique_id ?? '-' %></td>
+                  <td>
+                    <%= (typeof r.final_score !== 'undefined') ? r.final_score :
+                    0 %>
+                  </td>
+                </tr>
+                <% }) %> <% } else { %>
+                <tr>
+                  <td colspan="7" style="text-align: center; opacity: 0.7">
+                    No results yet
+                  </td>
+                </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script src="/js/adminDashboard.js" defer></script>
+    <script src="/js/admin.js"></script>
+  </body>
+</html>

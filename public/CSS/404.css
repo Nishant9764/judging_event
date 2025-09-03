@@ -1,0 +1,101 @@
+/* Background Gradient (same theme as homepage) */
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #ff512f, #dd2476, #00c6ff, #11998e);
+  background-size: 300% 300%;
+  animation: gradientFlow 12s ease infinite;
+  font-family: 'Poppins', sans-serif;
+  color: #fff;
+  text-align: center;
+}
+
+@keyframes gradientFlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Center container */
+.container {
+  padding: 20px;
+}
+
+/* Big Glitchy 404 effect */
+.glitch {
+  font-size: 120px;
+  font-weight: 900;
+  position: relative;
+  display: inline-block;
+  animation: flicker 2s infinite;
+}
+
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  overflow: hidden;
+  color: #ff512f;
+  clip: rect(0, 900px, 0, 0);
+}
+
+.glitch::before {
+  animation: glitchTop 2s infinite linear alternate-reverse;
+  color: #00c6ff;
+}
+
+.glitch::after {
+  animation: glitchBottom 2s infinite linear alternate-reverse;
+  color: #11998e;
+}
+
+@keyframes glitchTop {
+  0% { clip: rect(0, 9999px, 0, 0); }
+  20% { clip: rect(0, 9999px, 50px, 0); transform: translate(-5px, -5px); }
+  40% { clip: rect(0, 9999px, 10px, 0); transform: translate(5px, 5px); }
+  60% { clip: rect(0, 9999px, 30px, 0); transform: translate(-3px, 3px); }
+  80% { clip: rect(0, 9999px, 70px, 0); transform: translate(3px, -3px); }
+  100% { clip: rect(0, 9999px, 0, 0); }
+}
+
+@keyframes glitchBottom {
+  0% { clip: rect(0, 9999px, 0, 0); }
+  20% { clip: rect(50px, 9999px, 100px, 0); transform: translate(5px, 5px); }
+  40% { clip: rect(10px, 9999px, 60px, 0); transform: translate(-5px, -5px); }
+  60% { clip: rect(40px, 9999px, 80px, 0); transform: translate(3px, -3px); }
+  80% { clip: rect(20px, 9999px, 90px, 0); transform: translate(-3px, 3px); }
+  100% { clip: rect(0, 9999px, 0, 0); }
+}
+
+/* Flicker glow effect */
+@keyframes flicker {
+  0%, 100% { text-shadow: 0 0 10px #fff, 0 0 20px #ff512f, 0 0 30px #dd2476; }
+  50% { text-shadow: 0 0 20px #00c6ff, 0 0 40px #11998e, 0 0 60px #fff; }
+}
+
+/* Button styling */
+.btn {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 12px 25px;
+  border-radius: 30px;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  border-image: linear-gradient(90deg, #ff512f, #dd2476, #00c6ff, #11998e) 1;
+}
+
+.btn:hover {
+  background: #fff;
+  color: #000;
+  transform: scale(1.05);
+}

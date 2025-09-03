@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+    <link rel="stylesheet" href="css/home.css" />
+  </head>
+  <body>
+    <header class="top-header">
+      <div class="header-left">
+        <img src="/image/logo-left.jpg" alt="Left Logo" class="header-logo" />
+      </div>
+      <h1 class="header-title">ISKCON NRJD Nandotsav 2025</h1>
+      <div class="header-right">
+        <img src="/image/logo-right.jpg" alt="Right Logo" class="header-logo" />
+      </div>
+    </header>
+
+    <section class="main-section">
+      <div class="container">
+        <!-- Header Section -->
+        <div class="header">
+          <p class="subtitle">Sign in to access the judging platform</p>
+        </div>
+
+        <% if (typeof error !== 'undefined') { %>
+          <script>alert("<%= error %>");</script>
+        <% } %>
+
+        <!-- Form Container -->
+        <div class="form-container">
+          <div class="form-header">
+            <h2 class="form-title">Welcome</h2>
+            <p class="form-description">Enter your credentials to continue.</p>
+          </div>
+
+          <form class="form" action="/login" method="POST">
+            <!-- Username -->
+            <div class="form-group">
+              <label class="form-label">Username</label>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                class="form-input"
+                placeholder="Enter your username"
+                required
+              />
+            </div>
+
+            <!-- Password -->
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                class="form-input"
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+
+            <!-- Role Dropdown (custom) -->
+            <div class="form-group">
+              <label class="form-label">Role</label>
+              <div class="dropdown">
+                <button
+                  type="button"
+                  id="roleDropdownBtn"
+                  class="dropdown-button"
+                  onclick="toggleDropdown()"
+                >
+                  <div class="dropdown-content">
+                    <svg
+                      class="dropdown-icon"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.6 14.8,10.5V11.5C14.8,12.4 14.4,13.2 13.7,13.7L17.25,18H15.45L12,13.85L8.55,18H6.75L10.3,13.7C9.6,13.2 9.2,12.4 9.2,11.5V10.5C9.2,8.6 10.6,7 12,7Z"
+                      />
+                    </svg>
+                    <span class="dropdown-text" id="selectedRole"
+                      >Administrator</span
+                    >
+                  </div>
+                  <svg
+                    class="dropdown-arrow"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M7 10l5 5 5-5z" />
+                  </svg>
+                </button>
+                <div id="roleDropdown" class="dropdown-menu dropdown-hidden">
+                  <button
+                    type="button"
+                    class="dropdown-item"
+                    onclick="selectRole('Administrator')"
+                  >
+                    Administrator
+                  </button>
+                  <button
+                    type="button"
+                    class="dropdown-item"
+                    onclick="selectRole('Judge')"
+                  >
+                    Judge
+                  </button>
+                </div>
+              </div>
+              <!-- ✅ hidden input to submit role -->
+              <input
+                type="hidden"
+                name="role"
+                id="roleInput"
+                value="Administrator"
+              />
+            </div>
+
+            <!-- Sign In -->
+            <button type="submit" class="sign-in-button">Sign In</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <%- include('../partials/footer') %>
+
+    <script>
+      let selectedRole = "Administrator";
+
+      function toggleDropdown() {
+        const dropdown = document.getElementById("roleDropdown");
+        dropdown.classList.toggle("dropdown-hidden");
+        dropdown.classList.toggle("dropdown-visible");
+      }
+
+      function selectRole(role) {
+        selectedRole = role;
+        document.getElementById("selectedRole").textContent = role;
+
+        // ✅ update hidden input
+        document.getElementById("roleInput").value = role;
+
+        toggleDropdown();
+      }
+
+      // Close dropdown when clicking outside
+      document.addEventListener("click", function (event) {
+        const dropdown = document.getElementById("roleDropdown");
+        const dropdownBtn = document.getElementById("roleDropdownBtn");
+
+        if (
+          !dropdownBtn.contains(event.target) &&
+          !dropdown.contains(event.target)
+        ) {
+          if (!dropdown.classList.contains("dropdown-hidden")) toggleDropdown();
+        }
+      });
+    </script>
+  </body>
+</html>
