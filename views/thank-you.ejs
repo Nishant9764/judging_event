@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thank You – ISKCON NRJD</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #0f0720, #1a0a2e, #0d1b4a);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        position: relative;
+      }
+      .particle {
+        position: fixed;
+        border-radius: 50%;
+        pointer-events: none;
+        animation: floatUp linear infinite;
+      }
+      @keyframes floatUp {
+        0% {
+          transform: translateY(100vh) rotate(0deg);
+          opacity: 0.8;
+        }
+        100% {
+          transform: translateY(-120px) rotate(360deg);
+          opacity: 0;
+        }
+      }
+      .card {
+        position: relative;
+        z-index: 10;
+        background: rgba(255, 255, 255, 0.07);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 28px;
+        padding: 52px 44px;
+        text-align: center;
+        backdrop-filter: blur(20px);
+        max-width: 520px;
+        width: 90%;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+        animation: cardIn 0.5s ease;
+      }
+      @keyframes cardIn {
+        from {
+          opacity: 0;
+          transform: translateY(24px) scale(0.96);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      .icon-ring {
+        width: 96px;
+        height: 96px;
+        border-radius: 50%;
+        margin: 0 auto 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 46px;
+        animation: bob 2.8s ease-in-out infinite;
+        position: relative;
+      }
+      .icon-ring.done {
+        background: linear-gradient(135deg, #f97316, #eab308);
+        box-shadow: 0 8px 32px rgba(249, 115, 22, 0.4);
+      }
+      .icon-ring.waiting {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        box-shadow: 0 8px 32px rgba(99, 102, 241, 0.4);
+      }
+      @keyframes bob {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-12px);
+        }
+      }
+      h1 {
+        font-family: "Cinzel", serif;
+        font-size: 26px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        background: linear-gradient(135deg, #f97316, #eab308);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .room-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 99px;
+        padding: 7px 18px;
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.85);
+        margin: 12px 0 20px;
+      }
+      .room-pill strong {
+        color: #eab308;
+      }
+      .status-box {
+        border-radius: 16px;
+        padding: 18px 20px;
+        text-align: left;
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+        margin-bottom: 20px;
+      }
+      .status-box.done {
+        background: rgba(34, 197, 94, 0.1);
+        border: 1px solid rgba(34, 197, 94, 0.25);
+      }
+      .status-box.waiting {
+        background: rgba(99, 102, 241, 0.1);
+        border: 1px solid rgba(99, 102, 241, 0.25);
+      }
+      .status-icon {
+        font-size: 26px;
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+      .status-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 4px;
+      }
+      .status-desc {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.65);
+        line-height: 1.6;
+      }
+      .steps {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin: 20px 0;
+        text-align: left;
+      }
+      .step {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        background: rgba(255, 255, 255, 0.06);
+        border-radius: 10px;
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.8);
+      }
+      .step-dot {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+      .step-dot.done {
+        background: #22c55e;
+        color: #fff;
+      }
+      .step-dot.active {
+        background: #6366f1;
+        color: #fff;
+        animation: pulse 1.5s infinite;
+      }
+      .step-dot.pending {
+        background: rgba(255, 255, 255, 0.15);
+        color: rgba(255, 255, 255, 0.4);
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.6);
+        }
+        50% {
+          box-shadow: 0 0 0 8px rgba(99, 102, 241, 0);
+        }
+      }
+      .mantra {
+        margin-top: 22px;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.28);
+        font-style: italic;
+        line-height: 1.9;
+      }
+      .confetti-piece {
+        position: fixed;
+        pointer-events: none;
+        animation: confettiFall linear forwards;
+      }
+      @keyframes confettiFall {
+        0% {
+          transform: translateY(-20px) rotate(0deg);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(110vh) rotate(720deg);
+          opacity: 0;
+        }
+      }
+      @media (max-width: 480px) {
+        .card {
+          padding: 36px 24px;
+        }
+        .icon-ring {
+          width: 76px;
+          height: 76px;
+          font-size: 36px;
+        }
+        h1 {
+          font-size: 21px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="particles-bg"></div>
+    <div class="card">
+      <div class="icon-ring <%= waiting ? 'waiting' : 'done' %>">
+        <% if (waiting) { %>
+        <svg
+          width="44"
+          height="44"
+          fill="none"
+          stroke="#fff"
+          stroke-width="1.8"
+          viewBox="0 0 24 24"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <polyline points="12 6 12 12 16 14" />
+        </svg>
+        <% } else { %>
+        <svg
+          width="44"
+          height="44"
+          fill="none"
+          stroke="#1a0a2e"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
+          <path d="M18 2H6a2 2 0 0 0-2 2v16l4-2 4 2 4-2 4 2V4a2 2 0 0 0-2-2z" />
+          <line x1="9" y1="9" x2="15" y2="9" />
+          <line x1="9" y1="13" x2="12" y2="13" />
+        </svg>
+        <% } %>
+      </div>
+
+      <h1><%= waiting ? 'Scoring Submitted!' : 'Room Officially Closed!' %></h1>
+
+      <% if (roomNumber) { %>
+      <div class="room-pill">
+        <svg
+          width="14"
+          height="14"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+          <circle cx="12" cy="10" r="3" />
+        </svg>
+        Room <strong><%= roomNumber %></strong>
+      </div>
+      <% } %>
+
+      <div class="status-box <%= waiting ? 'waiting' : 'done' %>">
+        <div class="status-icon">
+          <% if (waiting) { %>
+          <svg
+            width="26"
+            height="26"
+            fill="none"
+            stroke="#6366f1"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+          <% } else { %>
+          <svg
+            width="26"
+            height="26"
+            fill="none"
+            stroke="#22c55e"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+          >
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          <% } %>
+        </div>
+        <div>
+          <div class="status-title">
+            <% if (waiting) { %>Waiting for other judges<% } else { %>All done —
+            Hare Krishna!<% } %>
+          </div>
+          <div class="status-desc">
+            <% if (waiting) { %> Your scores have been recorded. The room will
+            be officially closed by the admin once all judges complete their
+            evaluation. <% } else { %> The room has been officially closed by
+            the admin. All results are locked. Thank you for your service to
+            Krishna's festival! <% } %>
+          </div>
+        </div>
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-dot done">
+            <svg
+              width="12"
+              height="12"
+              fill="none"
+              stroke="#fff"
+              stroke-width="2.5"
+              viewBox="0 0 24 24"
+            >
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </div>
+          <span>Your scores submitted</span>
+        </div>
+        <div class="step">
+          <% if (waiting) { %>
+          <div class="step-dot active">2</div>
+          <% } else { %>
+          <div class="step-dot done">
+            <svg
+              width="12"
+              height="12"
+              fill="none"
+              stroke="#fff"
+              stroke-width="2.5"
+              viewBox="0 0 24 24"
+            >
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </div>
+          <% } %>
+          <span
+            ><% if (waiting) { %>Waiting for other judges to finish<% } else {
+            %>All judges completed<% } %></span
+          >
+        </div>
+        <div class="step">
+          <% if (waiting) { %>
+          <div class="step-dot pending">3</div>
+          <% } else { %>
+          <div class="step-dot done">
+            <svg
+              width="12"
+              height="12"
+              fill="none"
+              stroke="#fff"
+              stroke-width="2.5"
+              viewBox="0 0 24 24"
+            >
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </div>
+          <% } %>
+          <span
+            ><% if (waiting) { %>Admin will close the room<% } else { %>Admin
+            officially closed the room<% } %></span
+          >
+        </div>
+      </div>
+
+      <p class="mantra">
+        Hare Krishna Hare Krishna · Krishna Krishna Hare Hare<br />
+        Hare Rama Hare Rama · Rama Rama Hare Hare
+      </p>
+    </div>
+
+    <script>
+      // Floating particles — no template literals in style attrs
+      var bg = document.getElementById("particles-bg");
+      var colors = [
+        "rgba(249,115,22,.2)",
+        "rgba(234,179,8,.15)",
+        "rgba(99,102,241,.15)",
+        "rgba(139,92,246,.12)",
+      ];
+      for (var i = 0; i < 18; i++) {
+        var p = document.createElement("div");
+        p.className = "particle";
+        var c = colors[Math.floor(Math.random() * colors.length)];
+        var s = 4 + Math.random() * 10;
+        var delay = Math.random() * 10;
+        var duration = 8 + Math.random() * 14;
+        var left = Math.random() * 100;
+        p.style.left = left + "%";
+        p.style.width = s + "px";
+        p.style.height = s + "px";
+        p.style.background = c;
+        p.style.animationDelay = delay + "s";
+        p.style.animationDuration = duration + "s";
+        bg.appendChild(p);
+      }
+    </script>
+
+    <% if (!waiting) { %>
+    <script>
+      // Confetti — NO template literals inside style attrs (fixes VS Code red marks)
+      var cc = [
+        "#f97316",
+        "#eab308",
+        "#22c55e",
+        "#6366f1",
+        "#ec4899",
+        "#06b6d4",
+        "#a855f7",
+      ];
+      for (var ci = 0; ci < 80; ci++) {
+        var piece = document.createElement("div");
+        piece.className = "confetti-piece";
+        var cs = 6 + Math.random() * 10;
+        var col = cc[Math.floor(Math.random() * cc.length)];
+        var isCircle = Math.random() > 0.5;
+        var cdelay = Math.random() * 2.5;
+        var cdur = 2.5 + Math.random() * 3.5;
+        var cleft = Math.random() * 100;
+        piece.style.left = cleft + "%";
+        piece.style.top = "-10px";
+        piece.style.background = col;
+        piece.style.width = cs + "px";
+        piece.style.height = cs + "px";
+        piece.style.borderRadius = isCircle ? "50%" : "2px";
+        piece.style.animationDelay = cdelay + "s";
+        piece.style.animationDuration = cdur + "s";
+        document.body.appendChild(piece);
+      }
+      // Celebration sound
+      try {
+        var actx = new (window.AudioContext || window.webkitAudioContext)();
+        var notes = [
+          [523, 0],
+          [659, 0.18],
+          [784, 0.36],
+          [1047, 0.55],
+          [1319, 0.74],
+        ];
+        notes.forEach(function (note) {
+          var freq = note[0],
+            time = note[1];
+          var o = actx.createOscillator();
+          var g = actx.createGain();
+          o.connect(g);
+          g.connect(actx.destination);
+          o.type = "sine";
+          o.frequency.value = freq;
+          g.gain.setValueAtTime(0.14, actx.currentTime + time);
+          g.gain.exponentialRampToValueAtTime(
+            0.001,
+            actx.currentTime + time + 0.45
+          );
+          o.start(actx.currentTime + time);
+          o.stop(actx.currentTime + time + 0.45);
+        });
+      } catch (e) {}
+    </script>
+    <% } %>
+  </body>
+</html>

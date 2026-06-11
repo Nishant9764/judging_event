@@ -1,0 +1,209 @@
+Database: auth_db;
+
+
+TABLES:
++---------------------------+
+| Tables_in_auth_db         |
++---------------------------+
+| event_parameters          |
+| events                    |
+| judge_assignments_history |
+| rooms                     |
+| schoolevents              |
+| student_scores            |
+| users                     |
++---------------------------+
+
+
+event_parameters:
+CREATE TABLE `event_parameters` (
+  `parameter_id` int NOT NULL AUTO_INCREMENT,
+  `event_id` int DEFAULT NULL,
+  `parameter_name` varchar(100) DEFAULT NULL,
+  `max_score` int DEFAULT NULL,
+  PRIMARY KEY (`parameter_id`),
+  KEY `event_id` (`event_id`),
+  CONSTRAINT `event_parameters_ibfk_1` FOREIGN KEY (`event_id`) REFERENCES `events` (`event_id`)
+)
+
+
+events:
+CREATE TABLE `events` (
+  `event_id` int NOT NULL AUTO_INCREMENT,
+  `event_name` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`event_id`)
+) 
+
+
+
+judge_assignments_history:
+CREATE TABLE `judge_assignments_history` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `room_id` int NOT NULL,
+  `assigned_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `room_id` (`room_id`),
+  CONSTRAINT `judge_assignments_history_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `judge_assignments_history_ibfk_2` FOREIGN KEY (`room_id`) REFERENCES `rooms` (`id`) ON DELETE CASCADE
+)
+
+
+
+
+rooms:
+CREATE TABLE `rooms` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `room_number` varchar(100) NOT NULL,
+  `event_name` varchar(255) NOT NULL,
+  `capacity` int NOT NULL DEFAULT '3',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `status` enum('open','closed') DEFAULT 'open',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `room_number` (`room_number`)
+)
+
+
+
+schoolevents:
+CREATE TABLE `schoolevents` (
+  `SCHOOL` varchar(50) DEFAULT NULL,
+  `GROUP_ID` varchar(10) DEFAULT NULL,
+  `EVENT` varchar(50) DEFAULT NULL,
+  `CLASS` varchar(20) DEFAULT NULL,
+  `SEC` varchar(5) DEFAULT NULL,
+  `NAME` varchar(50) DEFAULT NULL,
+  `room` varchar(25) DEFAULT NULL,
+  `is_selected` tinyint(1) NOT NULL DEFAULT '0',
+  `unique_id` varchar(255) DEFAULT NULL,
+  `comments` text,
+  UNIQUE KEY `unique_id` (`unique_id`)
+) 
+
+
+
+
+student_scores:
+CREATE TABLE `student_scores` (
+  `score_id` int NOT NULL AUTO_INCREMENT,
+  `student_id` varchar(255) DEFAULT NULL,
+  `event_id` int DEFAULT NULL,
+  `parameter_id` int DEFAULT NULL,
+  `score` int DEFAULT NULL,
+  `judge_id` int DEFAULT NULL,
+  PRIMARY KEY (`score_id`),
+  KEY `event_id` (`event_id`),
+  KEY `parameter_id` (`parameter_id`),
+  KEY `student_scores_ibfk_1` (`student_id`),
+  CONSTRAINT `student_scores_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `schoolevents` (`unique_id`),
+  CONSTRAINT `student_scores_ibfk_2` FOREIGN KEY (`event_id`) REFERENCES `events` (`event_id`),
+  CONSTRAINT `student_scores_ibfk_3` FOREIGN KEY (`parameter_id`) REFERENCES `event_parameters` (`parameter_id`)
+) 
+
+
+users:
+CREATE TABLE `users` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `password` varchar(255) NOT NULL,
+  `role` varchar(50) DEFAULT NULL,
+  `room_id` int DEFAULT NULL,
+  `assigned_at` timestamp NULL DEFAULT NULL,
+  `assignment_status` enum('pending','completed') DEFAULT 'pending',
+  PRIMARY KEY (`id`),
+  KEY `fk_users_room` (`room_id`),
+  CONSTRAINT `fk_users_room` FOREIGN KEY (`room_id`) REFERENCES `rooms` (`id`) ON DELETE SET NULL
+) 
+
+ALTER TABLE schoolevents 
+ADD UNIQUE INDEX idx_unique_id (unique_id);
+
+ALTER TABLE student_scores 
+ADD INDEX idx_judge_id (judge_id);
+
+ALTER TABLE student_scores 
+ADD INDEX idx_student_event (student_id, event_id, judge_id);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- ============================================================
+--  ISKCON NRJD – DB Migrations (run once)
+-- ============================================================
+
+-- 1. Announcements (admin broadcasts to all judges)
+CREATE TABLE IF NOT EXISTS announcements (
+  id            INT AUTO_INCREMENT PRIMARY KEY,
+  message       TEXT         NOT NULL,
+  priority      ENUM('normal','urgent') DEFAULT 'normal',
+  created_by    VARCHAR(255) DEFAULT 'Admin',
+  is_active     TINYINT(1)   DEFAULT 1,
+  created_at    TIMESTAMP    DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 2. Help requests (judge → admin)
+CREATE TABLE IF NOT EXISTS help_requests (
+  id          INT AUTO_INCREMENT PRIMARY KEY,
+  judge_id    INT          NOT NULL,
+  judge_name  VARCHAR(100) NOT NULL,
+  room_number VARCHAR(50)  DEFAULT NULL,
+  message     TEXT         NOT NULL,
+  status      ENUM('pending','acknowledged','resolved') NOT NULL DEFAULT 'pending',
+  created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_status (status),
+  INDEX idx_judge  (judge_id)
+);
+ 
+-- ── messages ─────────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS messages (
+  id        INT AUTO_INCREMENT PRIMARY KEY,
+  from_id   INT          NOT NULL,
+  from_name VARCHAR(100) NOT NULL,
+  from_role ENUM('Administrator','Judge') NOT NULL,
+  to_id     INT          DEFAULT NULL,   -- NULL = broadcast to all judges
+  to_name   VARCHAR(100) DEFAULT NULL,
+  body      TEXT         NOT NULL,
+  is_read   TINYINT(1)   NOT NULL DEFAULT 0,
+  created_at TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_to_id   (to_id),
+  INDEX idx_from_id (from_id),
+  INDEX idx_created (created_at)
+);
+
+-- 4. Add admin-close flag to rooms (judges mark done → admin does final close)
+ALTER TABLE rooms
+  ADD COLUMN IF NOT EXISTS judge_done       TINYINT(1) DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS admin_closed     TINYINT(1) DEFAULT 0;
+
+-- ============================================================
+-- Verify
+-- ============================================================
+SHOW TABLES;
+
+CREATE EVENT IF NOT EXISTS cleanup_announcements
+ON SCHEDULE EVERY 10 MINUTE
+DO 
+UPDATE announcements 
+SET is_active = 0 
+WHERE created_at < DATE_SUB(NOW(), INTERVAL 10 MINUTE);

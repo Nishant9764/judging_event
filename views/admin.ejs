@@ -1,440 +1,1248 @@
+<!-- views/admin.ejs — Complete Production Grade -->
+<!-- IMPORTANT: This file replaces your existing views/admin.ejs -->
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="/CSS/admin.css" />
+    <title>Admin – ISKCON NRJD Nandotsav</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="/CSS/admin.css" />
+    <link rel="stylesheet" href="/CSS/admin-additions.css" />
   </head>
   <body>
-    <div class="dashboard-container">
-      <!-- Sidebar Navigation -->
-      <aside class="sidebar">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div id="admin-ann-banner" class="hidden">
+      <span id="admin-ann-text"></span>
+      <button id="ann-clear-btn" onclick="clearAllAnnouncements()">
+        Clear All
+      </button>
+    </div>
+
+    <div class="app-layout">
+      <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-          <h1 class="sidebar-title">ISKCON NRJD Nandotsav</h1>
-          <p class="sidebar-subtitle">Administrator Panel</p>
+          <div class="sidebar-logo">
+            <img src="/image/logo-left.jpg" alt="ISKCON" />
+          </div>
+          <div class="sidebar-brand">
+            <span class="brand-name">ISKCON NRJD</span
+            ><span class="brand-sub">Admin Panel</span>
+          </div>
+          <button class="sidebar-close" id="sidebarClose">
+            <svg
+              width="20"
+              height="20"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
         </div>
         <nav class="sidebar-nav">
-          <ul>
-            <li>
-              <a href="#" class="nav-link active" data-view="overview"
-                >Overview</a
-              >
-            </li>
-            <!-- <li><a href="#" class="nav-link" data-view="schools">Schools</a></li>
-                    <li><a href="#" class="nav-link" data-view="events">Events</a></li>
-                    <li><a href="#" class="nav-link" data-view="judges">Judges</a></li> -->
-            <li>
-              <a href="#" class="nav-link" data-view="students">Students</a>
-            </li>
-            <li>
-              <a href="#" class="nav-link" data-view="assignments"
-                >Create Room/ Judge Assignments</a
-              >
-            </li>
-            <li>
-              <a href="#" class="nav-link" data-view="scores">Leaderboard</a>
-            </li>
-          </ul>
+          <a href="#" class="nav-item active" data-view="overview">
+            <svg
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <rect x="3" y="3" width="7" height="7" />
+              <rect x="14" y="3" width="7" height="7" />
+              <rect x="14" y="14" width="7" height="7" />
+              <rect x="3" y="14" width="7" height="7" />
+            </svg>
+            Overview
+          </a>
+          <a href="#" class="nav-item" data-view="analytics">
+            <svg
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <line x1="18" y1="20" x2="18" y2="10" />
+              <line x1="12" y1="20" x2="12" y2="4" />
+              <line x1="6" y1="20" x2="6" y2="14" />
+            </svg>
+            Analytics
+          </a>
+          <a href="#" class="nav-item" data-view="students">
+            <svg
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            Students
+          </a>
+          <a href="#" class="nav-item" data-view="attendance">
+            <svg
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <path d="M9 11l3 3L22 4" />
+              <path
+                d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"
+              />
+            </svg>
+            Attendance
+          </a>
+          <a href="#" class="nav-item" data-view="uploadcsv">
+            <svg
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <polyline points="16 16 12 12 8 16" />
+              <line x1="12" y1="12" x2="12" y2="21" />
+              <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
+            </svg>
+            Upload CSV
+          </a>
+          <a href="#" class="nav-item" data-view="assignments">
+            <svg
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+            Rooms &amp; Judges
+            <span id="rooms-pending-badge">0</span>
+          </a>
+          <a href="#" class="nav-item" data-view="messages">
+            <svg
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+              />
+            </svg>
+            Messages
+            <span class="msg-nav-badge" id="msg-nav-badge">0</span>
+          </a>
+          <a href="#" class="nav-item" data-view="scores">
+            <svg
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <circle cx="12" cy="8" r="6" />
+              <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11" />
+            </svg>
+            Leaderboard
+          </a>
         </nav>
+        <div class="sidebar-footer">
+          <form method="post" action="/logout">
+            <button class="logout-btn">
+              <svg
+                width="16"
+                height="16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+              Logout
+            </button>
+          </form>
+        </div>
       </aside>
 
-      <!-- Main Content Area -->
       <main class="main-content">
-        <header class="header">
-          <div class="user-info">
-            <div class="user-details">
-              <p class="user-name">Admin</p>
+        <header class="topbar">
+          <button class="hamburger" id="hamburger">
+            <svg
+              width="22"
+              height="22"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
+          <div class="topbar-title" id="topbarTitle">Overview</div>
+          <div class="topbar-user">
+            <div
+              style="
+                position: relative;
+                display: inline-flex;
+                margin-right: 8px;
+              "
+            >
+              <button
+                id="helpPingBtn"
+                title="Help requests"
+                onclick="document.querySelector('.nav-item[data-view=overview]').click()"
+                style="
+                  background: none;
+                  border: none;
+                  cursor: pointer;
+                  padding: 4px;
+                  display: flex;
+                  align-items: center;
+                  color: rgba(255, 255, 255, 0.6);
+                "
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                </svg>
+              </button>
+              <span
+                id="help-ping-badge"
+                style="
+                  position: absolute;
+                  top: -3px;
+                  right: -3px;
+                  background: #ef4444;
+                  color: #fff;
+                  border-radius: 50%;
+                  width: 16px;
+                  height: 16px;
+                  font-size: 9px;
+                  font-weight: 700;
+                  display: none;
+                  align-items: center;
+                  justify-content: center;
+                "
+              ></span>
             </div>
-            <form method="post" action="/logout">
-              <button class="logout-btn">Logout</button>
-            </form>
+            <div class="user-avatar">A</div>
+            <span class="user-label">Administrator</span>
           </div>
         </header>
+        <div id="toastContainer" class="toast-container"></div>
 
-        <!-- Overview Section -->
-        <section id="overview" class="view active">
-          <div class="stats-grid">
-            <div class="stat-card">
-              <h4>Total Schools</h4>
-              <p><%= stats.schools %></p>
+        <!-- ═══ OVERVIEW ═══ -->
+        <section id="view-overview" class="view active">
+          <div class="view-inner">
+            <div class="page-title">
+              <h2>Dashboard Overview</h2>
+              <p>Live stats · ISKCON NRJD Nandotsav 2025</p>
             </div>
-            <div class="stat-card">
-              <h4>Events</h4>
-              <p><%= stats.events %></p>
+            <div class="stats-row">
+              <div class="stat-tile">
+                <div class="stat-icon icon-blue">
+                  <svg
+                    width="20"
+                    height="20"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                  </svg>
+                </div>
+                <div class="stat-data">
+                  <span class="stat-val"><%= stats.schools %></span
+                  ><span class="stat-lbl">Schools</span>
+                </div>
+              </div>
+              <div class="stat-tile">
+                <div class="stat-icon icon-purple">
+                  <svg
+                    width="20"
+                    height="20"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <rect x="3" y="4" width="18" height="18" rx="2" />
+                  </svg>
+                </div>
+                <div class="stat-data">
+                  <span class="stat-val"><%= stats.events %></span
+                  ><span class="stat-lbl">Events</span>
+                </div>
+              </div>
+              <div class="stat-tile">
+                <div class="stat-icon icon-orange">
+                  <svg
+                    width="20"
+                    height="20"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                  </svg>
+                </div>
+                <div class="stat-data">
+                  <span class="stat-val"><%= stats.students %></span
+                  ><span class="stat-lbl">Students</span>
+                </div>
+              </div>
+              <div class="stat-tile">
+                <div class="stat-icon icon-green">
+                  <svg
+                    width="20"
+                    height="20"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                  </svg>
+                </div>
+                <div class="stat-data">
+                  <span class="stat-val" id="totalRooms">0</span
+                  ><span class="stat-lbl">Rooms</span>
+                </div>
+              </div>
+              <div class="stat-tile">
+                <div class="stat-icon icon-teal">
+                  <svg
+                    width="20"
+                    height="20"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </div>
+                <div class="stat-data">
+                  <span class="stat-val" id="totalJudges">0</span
+                  ><span class="stat-lbl">Judges</span>
+                </div>
+              </div>
             </div>
-            <div class="stat-card">
-              <h4>Students</h4>
-              <p><%= stats.students %></p>
-            </div>
-          </div>
-          <div class="content-card">
-            <div class="dashboard-grid">
-              <div class="dashboard-container">
-                <!-- Left stats (three small cards) -->
-                <div class="overview-card card">
-                  <h3>Rooms Overview</h3>
-                  <div class="stat-line">
-                    <div>Total Rooms</div>
-                    <div id="totalRooms">0</div>
+            <div class="cards-row">
+              <div class="card">
+                <div class="card-header"><h3>Rooms</h3></div>
+                <div class="kv-list">
+                  <div class="kv-row">
+                    <span>Open</span
+                    ><span id="openRooms" class="kv-val badge-green">0</span>
                   </div>
-                  <div class="stat-line">
-                    <div>Open Rooms</div>
-                    <div id="openRooms">0</div>
+                  <div class="kv-row">
+                    <span>Judges Done</span
+                    ><span
+                      id="pendingCloseRooms"
+                      class="kv-val"
+                      style="color: #f97316; font-weight: 700"
+                      >0</span
+                    >
                   </div>
-                  <div class="stat-line">
-                    <div>Closed Rooms</div>
-                    <div id="closedRooms">0</div>
+                  <div class="kv-row">
+                    <span>Closed</span
+                    ><span id="closedRooms" class="kv-val badge-red">0</span>
                   </div>
                 </div>
-
-                <div class="overview-card card">
-                  <h3>Judges Overview</h3>
-                  <div class="stat-line">
-                    <div>Total Judges</div>
-                    <div id="totalJudges">0</div>
+              </div>
+              <div class="card">
+                <div class="card-header"><h3>Judges</h3></div>
+                <div class="kv-list">
+                  <div class="kv-row">
+                    <span>Assigned</span
+                    ><span id="assignedJudges" class="kv-val badge-blue"
+                      >0</span
+                    >
                   </div>
-                  <div class="stat-line">
-                    <div>Assigned</div>
-                    <div id="assignedJudges">0</div>
-                  </div>
-                  <div class="stat-line">
-                    <div>Completed</div>
-                    <div id="completedJudges">0</div>
+                  <div class="kv-row">
+                    <span>Completed</span
+                    ><span id="completedJudges" class="kv-val badge-green"
+                      >0</span
+                    >
                   </div>
                 </div>
-
-                <!-- Main details -->
-                <div class="details-card card">
-                  <h3>Room Assignments</h3>
-                  <div id="roomDetailsContainer"></div>
-                </div>
-
-                <!-- Alerts full width -->
-                <div class="alert-card card">
-                  <h3>Notifications</h3>
-                  <div id="dashboardAlerts">
-                    <p class="muted">Loading...</p>
+              </div>
+              <div class="card">
+                <div class="card-header"><h3>Scoring</h3></div>
+                <div class="kv-list">
+                  <div class="kv-row">
+                    <span>Judged</span
+                    ><span id="ov-scoredStudents" class="kv-val badge-green"
+                      >0</span
+                    >
                   </div>
+                  <div class="kv-row">
+                    <span>Total</span
+                    ><span id="ov-totalStudents" class="kv-val">0</span>
+                  </div>
+                  <div class="kv-row">
+                    <span>Complete</span
+                    ><span id="ov-completion" class="kv-val">0%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Broadcast -->
+            <div class="card mt-4">
+              <div class="card-header"><h3>Broadcast to All Judges</h3></div>
+              <div style="padding: 16px 20px">
+                <div class="ann-creator">
+                  <textarea
+                    id="ann-input"
+                    placeholder="Type an announcement..."
+                  ></textarea>
+                  <div class="ann-priority-wrap">
+                    <label>Priority</label
+                    ><select id="ann-priority">
+                      <option value="normal">Normal</option>
+                      <option value="urgent">Urgent</option>
+                    </select>
+                  </div>
+                  <button
+                    class="btn-dark btn-sm"
+                    onclick="sendAnnouncement()"
+                    style="padding: 10px 20px; align-self: flex-end"
+                  >
+                    Send
+                  </button>
+                </div>
+              </div>
+            </div>
+            <!-- Help requests -->
+            <div class="card mt-4">
+              <div class="card-header">
+                <h3>Help Requests</h3>
+                <span id="help-count-badge" class="card-badge">0</span>
+              </div>
+              <div style="padding: 12px 16px">
+                <div id="helpRequestsList" class="help-list">
+                  <p class="muted-text">No pending help requests.</p>
+                </div>
+              </div>
+            </div>
+            <!-- Alerts -->
+            <div class="card mt-4">
+              <div class="card-header">
+                <h3>Notifications</h3>
+                <span class="card-badge" id="alertCount">0</span>
+              </div>
+              <div style="padding: 12px 16px">
+                <div id="dashboardAlerts" class="alerts-list">
+                  <p class="muted-text">Loading...</p>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- STUDENT MANAGEMENT -->
-        <section id="students" class="view">
-          <div class="view-header">
-            <div>
+        <!-- ═══ ANALYTICS ═══ -->
+        <section id="view-analytics" class="view">
+          <div class="view-inner">
+            <div class="page-title">
+              <h2>Analytics</h2>
+              <p>Comprehensive event insights and performance metrics</p>
+            </div>
+            <div id="analytics-content">
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 12px;
+                  padding: 48px;
+                  color: #94a3b8;
+                  font-size: 14px;
+                "
+              >
+                <div class="spin-sm"></div>
+                Loading analytics...
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ═══ STUDENTS ═══ -->
+        <section id="view-students" class="view">
+          <div class="view-inner">
+            <div class="page-title">
               <h2>Student Management</h2>
-              <p>Manage student registrations for events</p>
+              <p>
+                Present: <strong id="att-present-count">0</strong> /
+                <strong id="att-total-count"><%= stats.students %></strong>
+                marked present &nbsp;&nbsp;
+                <button class="btn-sm btn-info" onclick="exportAbsentees()">
+                  Export Absentees
+                </button>
+              </p>
             </div>
-            <div class="search-container">
-              <input
-                type="search"
-                id="studentSearchInput"
-                placeholder="Search students..."
-              />
+            <div class="card">
+              <div class="card-header">
+                <div class="card-search">
+                  <svg
+                    width="16"
+                    height="16"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                  </svg>
+                  <input
+                    type="search"
+                    id="studentSearchInput"
+                    placeholder="Search name, school, event..."
+                  />
+                </div>
+                <div class="card-filters">
+                  <select id="eventFilterStudents" class="filter-select">
+                    <option value="">All Events</option>
+                  </select>
+                  <select id="schoolFilterStudents" class="filter-select">
+                    <option value="">All Schools</option>
+                  </select>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table class="data-table" id="studentsTable">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>School</th>
+                      <th>Group</th>
+                      <th>Event</th>
+                      <th>Class</th>
+                      <th>Sec</th>
+                      <th>Name</th>
+                      <th>Room</th>
+                      <th>Unique ID</th>
+                      <th>Present?</th>
+                    </tr>
+                  </thead>
+                  <tbody id="studentTableBody">
+                    <% let rowIdx=0; students.forEach(student=>{ rowIdx++; %>
+                    <tr
+                      data-event="<%= student.EVENT %>"
+                      data-school="<%= student.SCHOOL %>"
+                    >
+                      <td class="td-num"><%= rowIdx %></td>
+                      <td><%= student.SCHOOL %></td>
+                      <td><%= student.GROUP_ID %></td>
+                      <td>
+                        <span class="event-badge"><%= student.EVENT %></span>
+                      </td>
+                      <td><%= student.CLASS %></td>
+                      <td><%= student.SEC %></td>
+                      <td class="td-name">
+                        <strong><%= student.NAME %></strong>
+                      </td>
+                      <td>
+                        <div class="room-cell">
+                          <input type="text" class="room-input"
+                          placeholder="Select room" value="<%= student.room||''
+                          %>" <%= student.room?'readonly':'' %>/>
+                          <button
+                            class="btn-assign <%= student.room?'assigned':'' %>"
+                            data-studentname="<%= student.NAME %>"
+                          >
+                            <%= student.room?'Assigned':'Assign' %>
+                          </button>
+                        </div>
+                      </td>
+                      <td class="td-uid">
+                        <code><%= student.unique_id||'&mdash;' %></code>
+                      </td>
+                      <td class="td-check">
+                        <label
+                          class="checkbox-wrap"
+                          title="<%= student.is_selected?'Present':'Not marked' %>"
+                        >
+                          <input type="checkbox" class="student-checkbox"
+                          data-student-name="<%= student.NAME %>" <%=
+                          student.is_selected?'checked':'' %>/>
+                        </label>
+                        <span
+                          class="attendance-status <%= student.is_selected?'att-present':'att-absent' %>"
+                          style="
+                            font-size: 11px;
+                            font-weight: 600;
+                            margin-left: 4px;
+                          "
+                          ><%= student.is_selected?'Present':'—' %></span
+                        >
+                      </td>
+                    </tr>
+                    <% }) %>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
-          <div class="content-card">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>SCHOOL</th>
-                  <th>GROUP_ID</th>
-                  <th>EVENT</th>
-                  <th>CLASS</th>
-                  <th>SEC</th>
-                  <th>NAME</th>
-                  <th>Room</th>
-                  <th>Unique ID</th>
-                  <th>Select</th>
-                </tr>
-              </thead>
+        </section>
 
-              <tbody id="studentTableBody">
-                <% students.forEach(student => { %>
-                <tr data-event="<%= student.EVENT %>">
-                  <td><%= student.SCHOOL %></td>
-                  <td><%= student.GROUP_ID %></td>
-                  <td><%= student.EVENT %></td>
-                  <td><%= student.CLASS %></td>
-                  <td><%= student.SEC %></td>
-                  <td><%= student.NAME %></td>
-                  <td>
-                    <div class="room-assignment-cell">
-                      <input type="text" class="room-input" placeholder="Not
-                      assigned" value="<%= student.room || '' %>" <%=
-                      student.room ? 'readonly' : '' %> />
-                      <button
-                        class="btn btn-assign <%= student.room ? 'assigned' : '' %>"
-                        data-studentname="<%= student.NAME %>"
+        <!-- ═══ ATTENDANCE ═══ -->
+        <section id="view-attendance" class="view">
+          <div class="view-inner">
+            <div class="page-title">
+              <h2>Attendance Dashboard</h2>
+              <p>Filter and track student presence</p>
+            </div>
+            <!-- Filter bar -->
+            <div class="card">
+              <div class="card-header"><h3>Filters</h3></div>
+              <div id="att-filter-section" style="padding: 14px 20px">
+                <div class="att-filter-bar">
+                  <select id="att-event-filter">
+                    <option value="">All Events</option>
+                  </select>
+                  <select id="att-school-filter">
+                    <option value="">All Schools</option>
+                  </select>
+                  <button class="btn-sm btn-info" id="att-reset-filter">
+                    Reset Filters
+                  </button>
+                </div>
+              </div>
+            </div>
+            <!-- Summary cards -->
+            <div id="att-summary-section" class="mt-4">
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 12px;
+                  padding: 20px;
+                  color: #94a3b8;
+                  font-size: 14px;
+                "
+              >
+                <div class="spin-sm"></div>
+                Loading...
+              </div>
+            </div>
+            <!-- By Event -->
+            <div class="card mt-4">
+              <div class="card-header"><h3>Attendance by Event</h3></div>
+              <div class="table-wrap">
+                <table class="tbl">
+                  <thead>
+                    <tr>
+                      <th>Event</th>
+                      <th>Total</th>
+                      <th>Present</th>
+                      <th>Absent</th>
+                      <th>Rate</th>
+                      <th>Progress</th>
+                    </tr>
+                  </thead>
+                  <tbody id="att-event-table-body">
+                    <tr>
+                      <td
+                        colspan="6"
+                        style="
+                          text-align: center;
+                          color: #94a3b8;
+                          padding: 20px;
+                        "
                       >
-                        <%= student.room ? 'Assigned' : 'Assign' %>
-                      </button>
+                        Loading...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <!-- By School -->
+            <div class="card mt-4">
+              <div class="card-header">
+                <h3>Attendance by School</h3>
+                <button class="btn-sm btn-info" onclick="exportAbsentees()">
+                  Export Absentees CSV
+                </button>
+              </div>
+              <div class="table-wrap">
+                <table class="tbl">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>School</th>
+                      <th>Total</th>
+                      <th>Present</th>
+                      <th>Absent</th>
+                      <th>Rate</th>
+                    </tr>
+                  </thead>
+                  <tbody id="att-school-table-body">
+                    <tr>
+                      <td
+                        colspan="6"
+                        style="
+                          text-align: center;
+                          color: #94a3b8;
+                          padding: 20px;
+                        "
+                      >
+                        Loading...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ═══ UPLOAD CSV ═══ -->
+        <section id="view-uploadcsv" class="view">
+          <div class="view-inner">
+            <div class="page-title">
+              <h2>Upload Students via CSV</h2>
+              <p>Import student data in bulk</p>
+            </div>
+            <div class="card info-card">
+              <div class="card-header"><h3>Required Columns</h3></div>
+              <div class="col-badges">
+                <span class="col-badge">SCHOOL</span
+                ><span class="col-badge">GROUP_ID</span
+                ><span class="col-badge">EVENT</span
+                ><span class="col-badge">CLASS</span
+                ><span class="col-badge">SEC</span>
+                <span class="col-badge col-badge-required">NAME (required)</span
+                ><span class="col-badge col-badge-required"
+                  >EVENT (required)</span
+                >
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header"><h3>Upload File</h3></div>
+              <div class="upload-zone" id="uploadZone">
+                <div class="upload-icon">
+                  <svg
+                    width="40"
+                    height="40"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    viewBox="0 0 24 24"
+                  >
+                    <polyline points="16 16 12 12 8 16" />
+                    <line x1="12" y1="12" x2="12" y2="21" />
+                    <path
+                      d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"
+                    />
+                  </svg>
+                </div>
+                <p class="upload-label">Drag &amp; drop CSV here</p>
+                <label class="btn-choose" for="csvFileInput">Browse File</label>
+                <input
+                  type="file"
+                  id="csvFileInput"
+                  accept=".csv"
+                  class="hidden-input"
+                />
+              </div>
+              <div
+                class="file-selected"
+                id="fileSelected"
+                style="display: none"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                  />
+                </svg>
+                <span id="fileSelectedName"></span>
+                <button class="btn-remove-file" id="removeFile">x</button>
+              </div>
+              <button class="btn-upload" id="uploadBtn" disabled>
+                Upload &amp; Import
+              </button>
+              <div
+                class="upload-progress"
+                id="uploadProgress"
+                style="display: none"
+              >
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar-fill" id="progressFill"></div>
+                </div>
+                <p class="progress-text" id="progressText">Uploading...</p>
+              </div>
+              <div
+                class="upload-result"
+                id="uploadResult"
+                style="display: none"
+              ></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ═══ ROOMS & JUDGES ═══ -->
+        <section id="view-assignments" class="view">
+          <div class="view-inner">
+            <div class="page-title">
+              <h2>Rooms &amp; Judges</h2>
+              <p>Create rooms, assign judges, manage room closing</p>
+            </div>
+            <div class="two-col">
+              <div class="card">
+                <div class="card-header"><h3>Create Room</h3></div>
+                <form id="createRoomForm" class="form-inline">
+                  <div class="field-group">
+                    <label class="field-label">Room Number</label
+                    ><input
+                      type="text"
+                      id="roomNumber"
+                      class="field-input"
+                      placeholder="e.g. Hall-A"
+                      required
+                    />
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">Event Name</label
+                    ><input
+                      type="text"
+                      id="eventName"
+                      class="field-input"
+                      placeholder="e.g. Classical Dance"
+                      required
+                    />
+                  </div>
+                  <button type="submit" class="btn-primary-sm">
+                    Create Room
+                  </button>
+                </form>
+              </div>
+              <div class="card">
+                <div class="card-header"><h3>Assign Judge</h3></div>
+                <form id="assignRoomForm" class="form-inline">
+                  <div class="field-group">
+                    <label class="field-label"
+                      >Judge Name
+                      <small style="color: #94a3b8"
+                        >(existing judge auto-fills)</small
+                      ></label
+                    ><input
+                      type="text"
+                      id="judgeName"
+                      class="field-input"
+                      placeholder="Full name"
+                      required
+                      autocomplete="off"
+                    />
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">Judge Email</label
+                    ><input
+                      type="email"
+                      id="judgeEmail"
+                      class="field-input"
+                      placeholder="judge@email.com"
+                      required
+                      autocomplete="off"
+                    />
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">Room Number</label
+                    ><input
+                      type="text"
+                      id="roomNo"
+                      class="field-input"
+                      list="room-datalist"
+                      placeholder="Select or type room"
+                      required
+                    />
+                  </div>
+                  <button type="submit" class="btn-primary-sm">
+                    Assign Judge
+                  </button>
+                </form>
+                <div
+                  class="credentials-card"
+                  id="credentials-card"
+                  style="display: none"
+                >
+                  <div class="cred-header">Credentials (share securely)</div>
+                  <div class="cred-row">
+                    <span>Username</span><strong id="cred-username"></strong>
+                  </div>
+                  <div class="cred-row">
+                    <span>Password</span><strong id="cred-password"></strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Rooms table -->
+            <div class="card mt-4">
+              <div class="card-header">
+                <h3>All Rooms</h3>
+                <button
+                  class="action-btn action-btn-open"
+                  onclick="refreshAssignments()"
+                >
+                  Refresh
+                </button>
+              </div>
+              <div class="table-wrap">
+                <table class="tbl">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Room / Event</th>
+                      <th>Judges</th>
+                      <th>Students</th>
+                      <th>Progress</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="roomsTableBody">
+                    <tr>
+                      <td
+                        colspan="7"
+                        style="
+                          text-align: center;
+                          color: #94a3b8;
+                          padding: 28px;
+                        "
+                      >
+                        Loading...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <!-- Judges table -->
+            <div class="card mt-4">
+              <div class="card-header">
+                <h3>All Judges</h3>
+                <div style="display: flex; gap: 6px; flex-wrap: wrap">
+                  <button class="btn-filter active" data-judge-filter="all">
+                    All
+                  </button>
+                  <button class="btn-filter" data-judge-filter="active">
+                    Active
+                  </button>
+                  <button class="btn-filter" data-judge-filter="completed">
+                    Completed
+                  </button>
+                  <button class="btn-filter" data-judge-filter="unassigned">
+                    Unassigned
+                  </button>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table class="tbl">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Judge</th>
+                      <th>Room</th>
+                      <th>Event</th>
+                      <th>Status</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="judgesTableBody">
+                    <tr>
+                      <td
+                        colspan="6"
+                        style="
+                          text-align: center;
+                          color: #94a3b8;
+                          padding: 28px;
+                        "
+                      >
+                        Loading...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="card mt-4">
+              <div class="card-header"><h3>Notifications</h3></div>
+              <div style="padding: 12px 16px">
+                <div id="dashboardAlerts1" class="alerts-list">
+                  <p class="muted-text">Loading...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ═══ MESSAGES ═══ -->
+        <section id="view-messages" class="view">
+          <div class="view-inner">
+            <div class="page-title">
+              <h2>Messages</h2>
+              <p>Private chat with judges or broadcast to all</p>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <h3>Messenger</h3>
+                <span style="font-size: 12px; color: #94a3b8"
+                  >Select a judge for private chat</span
+                >
+              </div>
+              <div style="padding: 16px 20px">
+                <div class="msg-panel">
+                  <div class="msg-panel-header">
+                    <select id="msg-recipient">
+                      <option value="">Broadcast to ALL Judges</option>
+                    </select>
+                    <button
+                      class="action-btn action-btn-open"
+                      onclick="refreshMessages()"
+                    >
+                      Refresh
+                    </button>
+                  </div>
+                  <div id="admin-msg-list">
+                    <div class="msg-empty">
+                      <svg
+                        width="40"
+                        height="40"
+                        fill="none"
+                        stroke="#cbd5e1"
+                        stroke-width="1.5"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                        />
+                      </svg>
+                      <p>Select a judge or send a broadcast</p>
                     </div>
-                  </td>
-                  <td class="unique-id-cell"><%= student.unique_id || '' %></td>
-                  <td>
-                    <input type="checkbox" class="student-checkbox"
-                    data-student-name="<%= student.NAME %>" <%=
-                    student.is_selected ? 'checked' : '' %> />
-                  </td>
-                </tr>
-                <% }) %>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <!-- Assignments Section -->
-        <section id="assignments" class="view">
-          <div class="view-header">
-            <div>
-              <h2>Judge Assignments / Room Creation</h2>
-              <p>Assign events to judges and create rooms</p>
-            </div>
-          </div>
-
-          <!-- Create Room -->
-          <div class="content-card">
-            <h3>Create Room</h3>
-            <form
-              id="createRoomForm"
-              class="assignment-form"
-              style="
-                display: flex;
-                gap: 25px;
-                align-items: flex-end;
-                flex-wrap: wrap;
-              "
-            >
-              <div
-                style="display: flex; flex-direction: column; min-width: 220px"
-              >
-                <label
-                  for="roomNumber"
-                  style="font-weight: bold; margin-bottom: 6px"
-                  >Room Number/Name</label
-                >
-                <input
-                  type="text"
-                  name="roomNumber"
-                  id="roomNumber"
-                  placeholder="Enter Room Number/Name..."
-                  style="padding: 8px"
-                />
+                  </div>
+                  <div class="msg-send-row">
+                    <input
+                      type="text"
+                      id="admin-msg-input"
+                      placeholder="Type a message and press Enter..."
+                    />
+                    <button
+                      class="btn-dark btn-sm"
+                      id="admin-msg-send"
+                      style="padding: 10px 18px"
+                    >
+                      Send
+                    </button>
+                  </div>
+                </div>
               </div>
-              <div
-                style="display: flex; flex-direction: column; min-width: 220px"
-              >
-                <label
-                  for="eventName"
-                  style="font-weight: bold; margin-bottom: 6px"
-                  >Event Name</label
-                >
-                <input
-                  type="text"
-                  name="eventName"
-                  id="eventName"
-                  placeholder="Enter Event Name..."
-                  style="padding: 8px"
-                />
-              </div>
-              <button type="submit" class="btn">Create Room</button>
-            </form>
-            <!-- Notification container at top -->
-            <div
-              id="notification-container"
-              style="position: fixed; top: 20px; right: 20px; z-index: 9999"
-            ></div>
-          </div>
-
-          <!-- Assign Room -->
-          <div class="content-card">
-            <h3>Assign Room to Judges</h3>
-            <form
-              id="assignRoomForm"
-              class="assignment-form"
-              style="
-                display: flex;
-                gap: 25px;
-                align-items: flex-end;
-                flex-wrap: wrap;
-              "
-            >
-              <div
-                style="display: flex; flex-direction: column; min-width: 220px"
-              >
-                <label
-                  for="judgeName"
-                  style="font-weight: bold; margin-bottom: 6px"
-                  >Judge Name</label
-                >
-                <input
-                  type="text"
-                  name="judgeName"
-                  id="judgeName"
-                  placeholder="Enter Judge Name..."
-                  style="padding: 8px"
-                />
-              </div>
-              <div
-                style="display: flex; flex-direction: column; min-width: 220px"
-              >
-                <label
-                  for="roomNo"
-                  style="font-weight: bold; margin-bottom: 6px"
-                  >Room Number</label
-                >
-                <input
-                  type="text"
-                  name="roomNo"
-                  id="roomNo"
-                  placeholder="Enter Room Number..."
-                  style="padding: 8px"
-                />
-              </div>
-              <button type="submit" class="btn">Assign Room</button>
-            </form>
-
-            <div
-              id="notification-container1"
-              class="notification-container1"
-            ></div>
-
-            <div
-              id="credentials-card"
-              class="credentials-card"
-              style="display: none"
-            >
-              <h4>Judge Credentials</h4>
-              <p><b>Username:</b> <span id="cred-username"></span></p>
-              <p><b>Password:</b> <span id="cred-password"></span></p>
-            </div>
-
-            <div
-              id="credentialsOutput"
-              style="
-                margin-top: 15px;
-                padding: 10px;
-                border: 1px solid #ccc;
-                display: none;
-              "
-            ></div>
-          </div>
-
-          <div class="alert-card card">
-            <h3>Notifications</h3>
-            <div id="dashboardAlerts1">
-              <p class="muted">Loading...</p>
             </div>
           </div>
         </section>
 
-        <!-- Scores Section -->
-        <section id="scores" class="view">
-          <div class="view-header">
-            <div>
-              <h2>Scores & Ranks</h2>
-              <p class="small-muted">View scores and ranks of the students</p>
+        <!-- ═══ LEADERBOARD ═══ -->
+        <section id="view-scores" class="view">
+          <div class="view-inner">
+            <div class="page-title">
+              <h2>Leaderboard</h2>
+              <p>Live ranked results with filters</p>
             </div>
-
-            <!-- Filters: event, group, top N, manual refresh -->
-            <div class="filters">
-              <label for="eventFilter">Filter by Event:</label>
-              <select id="eventFilter" class="filter-select">
-                <option value="">All Events</option>
-              </select>
-
-              <label for="groupFilter">Filter by Group:</label>
-              <select id="groupFilter" class="filter-select">
-                <option value="">All Groups</option>
-              </select>
+            <div class="stats-row stats-row-3">
+              <div class="stat-tile">
+                <div class="stat-icon icon-blue">
+                  <svg
+                    width="20"
+                    height="20"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                  </svg>
+                </div>
+                <div class="stat-data">
+                  <span class="stat-val" id="total-students"
+                    ><%= stats.students||0 %></span
+                  ><span class="stat-lbl">Total</span>
+                </div>
+              </div>
+              <div class="stat-tile">
+                <div class="stat-icon icon-green">
+                  <svg
+                    width="20"
+                    height="20"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </div>
+                <div class="stat-data">
+                  <span class="stat-val" id="judged-students"
+                    ><%= stats.judged_students||0 %></span
+                  ><span class="stat-lbl">Judged</span>
+                </div>
+              </div>
+              <div class="stat-tile">
+                <div class="stat-icon icon-orange">
+                  <svg
+                    width="20"
+                    height="20"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <line x1="8" y1="6" x2="21" y2="6" />
+                    <line x1="8" y1="12" x2="21" y2="12" />
+                    <line x1="8" y1="18" x2="21" y2="18" />
+                  </svg>
+                </div>
+                <div class="stat-data">
+                  <span class="stat-val" id="completion"
+                    ><%= stats.completion_pct||0 %>%</span
+                  ><span class="stat-lbl">Complete</span>
+                </div>
+              </div>
             </div>
-          </div>
-
-          <!-- Stats -->
-          <div class="stats-grid" role="region" aria-label="Summary statistics">
-            <div class="stat-card">
-              <h4>Total Students</h4>
-              <p id="total-students">
-                <%= (stats && stats.total_students) ? stats.total_students : 0
-                %>
-              </p>
+            <div class="card">
+              <div class="card-header">
+                <h3>Results</h3>
+                <div class="card-filters">
+                  <select id="eventFilter" class="filter-select">
+                    <option value="">All Events</option>
+                  </select>
+                  <select id="groupFilter" class="filter-select">
+                    <option value="">All Groups</option>
+                  </select>
+                  <select id="schoolFilter" class="filter-select">
+                    <option value="">All Schools</option>
+                  </select>
+                  <select id="rankFilter" class="filter-select">
+                    <option value="">All Ranks</option>
+                    <option value="1">Rank #1</option>
+                    <option value="3">Top 3</option>
+                    <option value="5">Top 5</option>
+                    <option value="10">Top 10</option>
+                  </select>
+                  <button class="btn-sm btn-info" onclick="exportLeaderboard()">
+                    Export CSV
+                  </button>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Rank</th>
+                      <th>Student</th>
+                      <th>School</th>
+                      <th>Event</th>
+                      <th>Group</th>
+                      <th>Unique ID</th>
+                      <th>Score</th>
+                    </tr>
+                  </thead>
+                  <tbody id="leaderboardBody">
+                    <% if(typeof
+                    results!=='undefined'&&Array.isArray(results)&&results.length){results.forEach(r=>{%>
+                    <tr
+                      data-event="<%= r.event_name||'' %>"
+                      data-school="<%= r.school_name||'' %>"
+                      data-rank="<%= r.rank||999 %>"
+                      data-group="<%= r.group_id||'' %>"
+                    >
+                      <td>
+                        <span
+                          class="rank-badge"
+                          style="<%= r.rank==1?'color:#b45309':r.rank==2?'color:#475569':r.rank==3?'color:#c2410c':'' %>"
+                          >#<%= r.rank??'-' %></span
+                        >
+                      </td>
+                      <td><strong><%= r.student_name??'-' %></strong></td>
+                      <td><%= r.school_name??'-' %></td>
+                      <td>
+                        <span class="event-badge"
+                          ><%= r.event_name??'-' %></span
+                        >
+                      </td>
+                      <td><%= r.group_id??'-' %></td>
+                      <td class="td-uid">
+                        <code><%= r.unique_id??'-' %></code>
+                      </td>
+                      <td>
+                        <span class="score-val"><%= r.final_score??0 %></span>
+                      </td>
+                    </tr>
+                    <%})}else{%>
+                    <tr>
+                      <td colspan="7" class="td-empty">No results yet</td>
+                    </tr>
+                    <%}%>
+                  </tbody>
+                </table>
+              </div>
             </div>
-
-            <div class="stat-card">
-              <h4>Judged</h4>
-              <p id="judged-students">
-                <%= (stats && stats.judged_students) ? stats.judged_students : 0
-                %>
-              </p>
-            </div>
-
-            <div class="stat-card">
-              <h4>Completion</h4>
-              <p id="completion">
-                <%= (stats && typeof stats.completion_pct !== 'undefined') ?
-                stats.completion_pct + '%' : '0%' %>
-              </p>
-            </div>
-          </div>
-
-          <!-- Detailed Results -->
-          <div class="content-card" role="region" aria-label="Detailed results">
-            <h3>Detailed Results</h3>
-            <table class="data-table" aria-describedby="results-desc">
-              <caption id="results-desc" class="small-muted">
-                Ranked final scores per student (final score = sum of event
-                parameters)
-              </caption>
-              <thead>
-                <tr>
-                  <th>Rank</th>
-                  <th>Student</th>
-                  <th>School</th>
-                  <th>Event</th>
-                  <th>Group</th>
-                  <th>Unique ID</th>
-                  <th>Final Score</th>
-                </tr>
-              </thead>
-              <tbody id="leaderboardBody">
-                <% if (typeof results !== 'undefined' && Array.isArray(results)
-                && results.length) { %> <% results.forEach(function(r){ %>
-                <tr>
-                  <td>#<%= r.rank ?? '-' %></td>
-                  <td><%= r.student_name ?? '-' %></td>
-                  <td><%= r.school_name ?? '-' %></td>
-                  <td><%= r.event_name ?? '-' %></td>
-                  <td><%= r.group_id ?? '-' %></td>
-                  <td><%= r.unique_id ?? '-' %></td>
-                  <td>
-                    <%= (typeof r.final_score !== 'undefined') ? r.final_score :
-                    0 %>
-                  </td>
-                </tr>
-                <% }) %> <% } else { %>
-                <tr>
-                  <td colspan="7" style="text-align: center; opacity: 0.7">
-                    No results yet
-                  </td>
-                </tr>
-                <% } %>
-              </tbody>
-            </table>
           </div>
         </section>
       </main>
     </div>
+
+    <datalist id="room-datalist"></datalist>
     <script src="/js/adminDashboard.js" defer></script>
     <script src="/js/admin.js"></script>
   </body>

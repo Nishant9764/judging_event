@@ -1,201 +1,634 @@
+<%- /* views/judge.ejs — Premium Enhanced — ISKCON NRJD Nandotsav
+     Rename this file to judge.ejs. Replaces views/judge.ejs.
+     All original IDs preserved. New premium UI added on top.
+*/ "" %>
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Judge Scoring Panel</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <script src="https://unpkg.com/feather-icons"></script>
-    <link rel="stylesheet" href="/CSS/judge.css" />
-  </head>
-  <body class="bg-gray-50 text-gray-800">
-    <div id="app-container" class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-      <!-- HEADER -->
-      <header class="flex justify-between items-center mb-8">
-        <div class="flex items-center gap-3">
-          <div class="bg-gray-800 text-white p-3 rounded-lg">
-            <i data-feather="user-check" class="w-6 h-6"></i>
-          </div>
-          <div>
-            <h1 class="text-xl font-bold text-gray-900">School Events Judge</h1>
-            <p class="text-sm text-gray-500">Judge Panel</p>
-          </div>
-        </div>
-        <div class="flex items-center gap-4">
-          <span class="font-semibold"><%= user.name %></span>
-          <form method="post" action="/logout">
-            <button
-              class="flex items-center gap-2 text-gray-600 hover:text-gray-900"
-            >
-              <i data-feather="log-out" class="w-5 h-5"></i>
-              <span>Logout</span>
-            </button>
-          </form>
-        </div>
-      </header>
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Judge Panel – ISKCON NRJD</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/CSS/judge.css"/>
+  <style>
+    /* ═══════════════════════════════════════════════════
+       PREMIUM DASHBOARD ADDITIONS — all new, no conflicts
+    ═══════════════════════════════════════════════════ */
+    :root {
+      --deep:#0d0d1a;--card-bg:#1a1a2e;--card-border:rgba(255,255,255,.07);
+      --saffron:#f97316;--saffron-l:#fdba74;--gold:#eab308;
+      --text-primary:#f1f1f5;--text-secondary:rgba(255,255,255,.55);--text-muted:rgba(255,255,255,.3);
+    }
 
-      <!-- DASHBOARD VIEW -->
-      <main>
-        <div id="dashboard-view">
-          <!-- Welcome -->
-          <div class="mb-10">
-            <h2 class="text-2xl font-bold text-gray-900">
-              Welcome back, <%= user.name %>!
-            </h2>
-            <p class="text-gray-600">
-              Your active event assignment is: <%= assignedEvents.join(", ") %>
-            </p>
-          </div>
+    /* ── New premium announcement banner ── */
+    #j-ann-banner {
+      display:none;align-items:center;gap:10px;padding:9px 24px;
+      background:linear-gradient(90deg,#1d4ed8,#7c3aed);color:#fff;
+      font-size:13px;font-weight:600;position:relative;z-index:200;
+    }
+    #j-ann-banner.j-ann-visible{display:flex}
+    #j-ann-banner.j-ann-urgent{background:linear-gradient(90deg,#dc2626,#b91c1c);animation:jUrgent 1.5s infinite}
+    @keyframes jUrgent{0%,100%{opacity:1}50%{opacity:.85}}
+    .j-ann-dot{width:7px;height:7px;border-radius:50%;background:#fff;animation:jPulseDot 1.2s infinite;flex-shrink:0}
+    .j-ann-dismiss{margin-left:auto;background:rgba(255,255,255,.18);border:none;color:#fff;padding:3px 10px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer}
 
-          <!-- STATS CARDS -->
-          <div
-            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12"
-          >
-            <div
-              class="bg-white p-6 rounded-xl border border-gray-200 flex items-center gap-4"
-            >
-              <div class="bg-blue-100 text-blue-600 p-3 rounded-lg">
-                <i data-feather="calendar"></i>
-              </div>
-              <div>
-                <p class="text-gray-500 text-sm">Assigned Events</p>
-                <p class="text-2xl font-bold"><%= assignedEvents.length %></p>
-              </div>
-            </div>
-            <div
-              class="bg-white p-6 rounded-xl border border-gray-200 flex items-center gap-4"
-            >
-              <div class="bg-green-100 text-green-600 p-3 rounded-lg">
-                <i data-feather="users"></i>
-              </div>
-              <div>
-                <p class="text-gray-500 text-sm">Total Students</p>
-                <p class="text-2xl font-bold" id="total-students">0</p>
-              </div>
-            </div>
-            <div
-              class="bg-white p-6 rounded-xl border border-gray-200 flex items-center gap-4"
-            >
-              <div class="bg-purple-100 text-purple-600 p-3 rounded-lg">
-                <i data-feather="edit-3"></i>
-              </div>
-              <div>
-                <p class="text-gray-500 text-sm">Students Scored</p>
-                <p class="text-2xl font-bold" id="students-scored">0</p>
-              </div>
-            </div>
-            <div
-              class="bg-white p-6 rounded-xl border border-gray-200 flex items-center gap-4"
-            >
-              <div class="bg-yellow-100 text-yellow-600 p-3 rounded-lg">
-                <i data-feather="check-circle"></i>
-              </div>
-              <div>
-                <p class="text-gray-500 text-sm">Completed</p>
-                <p class="text-2xl font-bold" id="completed">0</p>
-              </div>
-            </div>
-          </div>
+    /* ── KPI strip ── */
+    .j-kpi-strip {
+      display:grid;grid-template-columns:repeat(4,1fr);gap:14px;
+      padding:0 0 4px;
+    }
+    .j-kpi {
+      background:var(--card-bg);border:1px solid var(--card-border);
+      border-radius:14px;padding:18px 20px;display:flex;align-items:center;gap:14px;
+      transition:transform .2s,box-shadow .2s;animation:jFU .4s ease both;
+    }
+    .j-kpi:hover{transform:translateY(-2px);box-shadow:0 10px 36px rgba(0,0,0,.4)}
+    .j-kpi-icon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .j-kpi-val{font-size:24px;font-weight:800;line-height:1;color:var(--text-primary)}
+    .j-kpi-lbl{font-size:10px;color:var(--text-muted);margin-top:3px;text-transform:uppercase;letter-spacing:.04em}
 
-          <!-- ASSIGNED EVENTS LIST -->
-          <div>
-            <h3 class="text-xl font-bold text-gray-900 mb-6">
-              Your Assigned Events
-            </h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              <% if (assignedRooms && assignedRooms.length > 0) { %> <%
-              assignedRooms.forEach(room => { %>
-              <div
-                class="bg-white p-6 rounded-xl border border-gray-200 flex flex-col"
-              >
-                <div class="flex justify-between items-start mb-2">
-                  <h4 class="text-lg font-bold"><%= room.event_name %></h4>
-                  <span
-                    class="text-xs font-medium bg-blue-100 text-blue-800 px-2.5 py-1 rounded-full"
-                    >in-progress</span
-                  >
-                </div>
-                <p class="text-sm text-gray-500 mb-4">
-                  <%= user.name %>'s assigned event
-                </p>
-                <div class="flex-grow"></div>
+    /* ── Two-col layout for enhanced dashboard ── */
+    .j-dash-cols {
+      display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start;
+      margin-top:20px;
+    }
+    @media(max-width:1100px){.j-dash-cols{grid-template-columns:1fr}}
 
-                <button
-                  data-event-id="<%= room.id %>"
-                  data-event-name="<%= room.event_name %>"
-                  data-room-number="<%= room.room_number %>"
-                  class="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 transition"
-                >
-                  Start Scoring - <%= room.event_name %>
-                </button>
-              </div>
-              <% }); %> <% } else { %>
-              <p class="text-gray-500">No events assigned.</p>
-              <% } %>
-            </div>
-          </div>
-        </div>
+    /* ── Room card premium wrapper ── */
+    .j-room-card-wrap {
+      background:var(--card-bg);border:1px solid var(--card-border);
+      border-radius:18px;overflow:hidden;
+      transition:transform .2s,box-shadow .2s;margin-bottom:16px;
+      animation:jFU .4s ease both;
+    }
+    .j-room-card-wrap:hover{transform:translateY(-2px);box-shadow:0 10px 36px rgba(0,0,0,.35)}
+    .j-room-card-wrap.j-room-closed{border-color:rgba(239,68,68,.15)}
+    .j-room-card-wrap.j-room-ready {border-color:rgba(99,102,241,.2)}
 
-        <!-- SCORING VIEW (placeholder, remains hidden) -->
-        <div id="scoring-view" class="hidden">
-          <div class="mb-8">
-            <button
-              onclick="showDashboardView()"
-              class="flex items-center gap-2 text-gray-600 hover:text-gray-800 font-semibold"
-            >
-              <i data-feather="arrow-left" class="w-5 h-5"></i>
-              Back to Dashboard
-            </button>
-          </div>
-          <div
-            class="bg-white p-4 sm:p-6 rounded-xl border border-gray-200 mb-6"
-          >
-            <h2 id="scoring-event-title" class="text-2xl font-bold"></h2>
-            <p id="scoring-event-subtitle" class="text-gray-500"></p>
-          </div>
-          <div class="flex flex-col lg:flex-row gap-8">
-            <aside class="lg:w-1/4">
-              <div class="bg-white p-4 rounded-xl border border-gray-200">
-                <h3 id="student-list-header" class="font-bold mb-2">
-                  Students (0)
-                </h3>
-                <div class="w-full progress-bar-bg rounded-full h-2 mb-4">
-                  <div
-                    id="student-progress-bar"
-                    class="bg-green-500 h-2 rounded-full"
-                    style="width: 0%"
-                  ></div>
-                </div>
-                <p
-                  id="student-progress-text"
-                  class="text-sm text-gray-500 mb-4"
-                >
-                  0% complete
-                </p>
-                <ul id="student-list-ul" class="space-y-2"></ul>
-              </div>
-            </aside>
-            <section class="flex-1">
-              <div
-                id="scoring-panel"
-                class="bg-white p-6 sm:p-8 rounded-xl border border-gray-200"
-              >
-                <div class="text-center p-12 text-gray-500">
-                  <p>Select a student from the list to start scoring.</p>
-                </div>
-              </div>
-            </section>
-          </div>
-        </div>
-      </main>
+    /* Card header */
+    .j-rc-head {
+      display:flex;align-items:center;justify-content:space-between;
+      padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.05);
+      position:relative;overflow:hidden;
+    }
+    .j-rc-head::before {
+      content:"";position:absolute;inset:0;pointer-events:none;
+      background:var(--j-rc-glow,radial-gradient(ellipse at right,rgba(249,115,22,.07),transparent 70%));
+    }
+    .j-rc-head-left{display:flex;align-items:center;gap:12px;position:relative}
+    .j-rc-icon {
+      width:40px;height:40px;border-radius:10px;
+      background:linear-gradient(135deg,var(--saffron),var(--gold));
+      display:flex;align-items:center;justify-content:center;
+      font-size:16px;font-weight:800;color:#1a0a2e;flex-shrink:0;
+    }
+    .j-rc-name{font-size:15px;font-weight:700;color:var(--text-primary)}
+    .j-rc-event{font-size:11px;color:var(--text-muted);margin-top:2px}
+
+    /* Status badge */
+    .j-status-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700}
+    .j-status-open  {background:rgba(34,197,94,.12);color:#4ade80}
+    .j-status-ready {background:rgba(99,102,241,.12);color:#a78bfa}
+    .j-status-closed{background:rgba(239,68,68,.1);color:#f87171}
+    .j-status-dot   {width:6px;height:6px;border-radius:50%;flex-shrink:0}
+    .j-status-open  .j-status-dot{background:#4ade80;animation:jPulseDot 1.5s infinite}
+    .j-status-ready .j-status-dot{background:#a78bfa;animation:jPulseDot 1s infinite}
+    .j-status-closed .j-status-dot{background:#f87171}
+    @keyframes jPulseDot{0%,100%{box-shadow:0 0 0 0 currentColor}50%{box-shadow:0 0 0 3px transparent}}
+
+    /* Card body */
+    .j-rc-body{padding:16px 20px}
+
+    /* Mini stats row */
+    .j-rc-mini-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+    .j-rc-mini-stat{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);border-radius:10px;padding:10px;text-align:center}
+    .j-rc-mini-val{display:block;font-size:20px;font-weight:800;color:var(--text-primary);line-height:1}
+    .j-rc-mini-lbl{display:block;font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;margin-top:3px}
+
+    /* Progress bar */
+    .j-rc-prog-head{display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-bottom:5px}
+    .j-rc-prog-track{height:7px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;margin-bottom:14px}
+    .j-rc-prog-fill{height:100%;background:linear-gradient(90deg,var(--saffron),var(--gold));border-radius:99px;transition:width 1s ease;width:0%}
+
+    /* Score dist mini bars */
+    .j-rc-dist{display:flex;align-items:flex-end;gap:4px;height:32px;margin-bottom:12px}
+    .j-rc-dist-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px}
+    .j-rc-dist-bar{width:100%;border-radius:3px 3px 0 0;min-height:2px}
+    .j-rc-dist-lbl{font-size:7px;color:var(--text-muted)}
+
+    /* Closed notice */
+    .j-closed-notice{
+      display:flex;align-items:center;gap:8px;
+      padding:10px 12px;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.15);
+      border-radius:10px;font-size:12px;color:rgba(239,68,68,.8);margin-bottom:12px;
+    }
+
+    /* Recent activity in card */
+    .j-rc-activity{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;max-height:110px;overflow-y:auto}
+    .j-rc-activity::-webkit-scrollbar{width:2px}
+    .j-rc-activity::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1)}
+    .j-rc-act-item{display:flex;align-items:center;gap:8px;padding:5px 8px;background:rgba(255,255,255,.02);border-radius:7px}
+    .j-rc-act-av{width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0}
+    .j-rc-act-name{flex:1;font-size:11px;font-weight:600;color:rgba(255,255,255,.7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .j-rc-act-score{font-size:11px;font-weight:800;color:var(--saffron-l);flex-shrink:0}
+
+    /* Card action buttons */
+    .j-rc-actions{display:flex;gap:8px}
+    .j-rc-btn{
+      flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+      padding:10px 12px;border-radius:10px;font-size:12px;font-weight:700;
+      border:none;cursor:pointer;transition:.2s;font-family:inherit;
+    }
+    .j-rc-btn-start{background:linear-gradient(135deg,var(--saffron),var(--gold));color:#1a0a2e}
+    .j-rc-btn-start:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 20px rgba(249,115,22,.4)}
+    .j-rc-btn-start:disabled{opacity:.45;cursor:not-allowed;transform:none;background:rgba(255,255,255,.08);color:rgba(255,255,255,.3);box-shadow:none}
+    .j-rc-btn-detail{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.65)}
+    .j-rc-btn-detail:hover{background:rgba(255,255,255,.1);color:#fff}
+
+    /* Expandable student detail */
+    .j-rc-detail{display:none;margin-top:12px;border-top:1px solid rgba(255,255,255,.05);padding-top:12px}
+    .j-rc-detail-label{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px}
+    .j-rc-student-list{max-height:180px;overflow-y:auto;display:flex;flex-direction:column;gap:4px}
+    .j-rc-student-list::-webkit-scrollbar{width:2px}
+    .j-rc-stu-row{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;background:rgba(255,255,255,.02)}
+    .j-rc-stu-av{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
+    .j-rc-stu-name{flex:1;font-size:11px;font-weight:600;color:rgba(255,255,255,.75);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .j-rc-stu-school{font-size:10px;color:rgba(255,255,255,.3)}
+    .j-rc-stu-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
+    .j-rc-stu-scored{background:rgba(34,197,94,.12);color:#4ade80}
+    .j-rc-stu-pending{background:rgba(255,255,255,.05);color:rgba(255,255,255,.3)}
+
+    /* ── Right sidebar ── */
+    .j-sidebar-card{
+      background:var(--card-bg);border:1px solid var(--card-border);
+      border-radius:14px;overflow:hidden;margin-bottom:16px;
+      animation:jFU .4s ease both;
+    }
+    .j-sidebar-head{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;border-bottom:1px solid rgba(255,255,255,.05)}
+    .j-sidebar-head h3{font-size:13px;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:7px}
+    .j-sidebar-badge{background:rgba(249,115,22,.12);color:var(--saffron-l);font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px}
+
+    /* Activity feed */
+    .j-act-list{display:flex;flex-direction:column}
+    .j-act-item{display:flex;align-items:center;gap:9px;padding:9px 18px;border-bottom:1px solid rgba(255,255,255,.04);transition:.15s}
+    .j-act-item:last-child{border:none}
+    .j-act-item:hover{background:rgba(255,255,255,.02)}
+    .j-act-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+    .j-act-text{flex:1;font-size:11px;color:rgba(255,255,255,.55)}
+    .j-act-text strong{color:rgba(255,255,255,.8);font-weight:600}
+    .j-act-score{font-size:11px;font-weight:800;color:var(--saffron-l);flex-shrink:0}
+    .j-act-time{font-size:9px;color:var(--text-muted);flex-shrink:0}
+
+    /* In-sidebar messages panel (new IDs) */
+    .j-sb-msg-list{
+      height:200px;overflow-y:auto;padding:10px 14px;
+      display:flex;flex-direction:column;gap:7px;
+      background:rgba(0,0,0,.15);scroll-behavior:smooth;
+    }
+    .j-sb-msg-list::-webkit-scrollbar{width:2px}
+    .j-sb-msg-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1)}
+    .j-sb-bubble{max-width:78%;padding:7px 11px;border-radius:11px;font-size:11px;line-height:1.5;word-break:break-word}
+    .j-sb-from-admin{background:rgba(99,102,241,.18);border:1px solid rgba(99,102,241,.2);align-self:flex-start;border-radius:4px 11px 11px 11px;color:rgba(255,255,255,.8)}
+    .j-sb-from-me   {background:rgba(249,115,22,.15);border:1px solid rgba(249,115,22,.2);align-self:flex-end;border-radius:11px 4px 11px 11px;color:rgba(255,255,255,.8)}
+    .j-sb-meta{font-size:9px;color:rgba(255,255,255,.3);margin-top:2px;display:block}
+    .j-sb-send-row{display:flex;gap:7px;padding:10px 14px;border-top:1px solid rgba(255,255,255,.05)}
+    .j-sb-input{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:8px 12px;font-size:12px;color:var(--text-primary);font-family:inherit;outline:none;transition:.2s}
+    .j-sb-input::placeholder{color:var(--text-muted)}
+    .j-sb-input:focus{border-color:rgba(249,115,22,.4)}
+    .j-sb-send-btn{padding:8px 14px;border-radius:9px;background:linear-gradient(135deg,var(--saffron),var(--gold));border:none;color:#1a0a2e;font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;transition:.15s}
+    .j-sb-send-btn:hover{box-shadow:0 3px 12px rgba(249,115,22,.4)}
+
+    /* Summary donut card */
+    .j-summary-body{padding:14px 18px;display:flex;flex-direction:column;gap:10px}
+
+    /* Help card in sidebar */
+    .j-help-card{
+      background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);
+      border-radius:14px;padding:14px 18px;margin-bottom:16px;
+      display:flex;align-items:center;gap:12px;
+      animation:jFU .4s ease .2s both;
+    }
+    .j-help-icon{width:36px;height:36px;border-radius:10px;background:rgba(239,68,68,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .j-help-info{flex:1}
+    .j-help-info strong{font-size:12px;color:rgba(255,255,255,.85)}
+    .j-help-info p{font-size:10px;color:var(--text-muted);margin-top:2px}
+    .j-help-req-btn{padding:8px 14px;border-radius:9px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#f87171;font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;transition:.15s;white-space:nowrap}
+    .j-help-req-btn:hover{background:rgba(239,68,68,.25)}
+
+    /* Section heading */
+    .j-section-head{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+    .j-section-head h3{font-size:14px;font-weight:700;color:var(--text-primary)}
+    .j-section-dot{width:5px;height:5px;border-radius:50%}
+
+    /* Toast container */
+    #j-toast-cont{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:7px;pointer-events:none}
+
+    /* Spinner small */
+    .spin-sm{width:16px;height:16px;border:2px solid rgba(255,255,255,.1);border-top-color:#f97316;border-radius:50%;animation:jSpin .7s linear infinite;flex-shrink:0}
+    @keyframes jSpin{to{transform:rotate(360deg)}}
+    @keyframes jFU{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+    @keyframes jFI{from{opacity:0}to{opacity:1}}
+
+    /* ── Responsive ── */
+    @media(max-width:768px){.j-kpi-strip{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:480px){.j-kpi-strip{grid-template-columns:1fr 1fr}}
+  </style>
+</head>
+<body>
+
+<!-- ── ORIGINAL announcement banner (judge.js needs this) ── -->
+<div id="announcement-banner">
+  <span id="ann-text"></span>
+  <span class="ann-close" onclick="dismissAnnouncement()">&#x2715;</span>
+</div>
+
+<!-- ── NEW premium announcement banner ── -->
+<div id="j-ann-banner">
+  <div class="j-ann-dot"></div>
+  <span id="j-ann-text"></span>
+  <button class="j-ann-dismiss" onclick="this.parentElement.classList.remove('j-ann-visible')">✕</button>
+</div>
+
+<div class="judge-layout">
+
+  <!-- ── TOPBAR ── -->
+  <header class="judge-topbar">
+    <div class="judge-brand">
+      <div class="judge-logo"><img src="/image/logo-left.jpg" alt="ISKCON"/></div>
+      <div>
+        <span class="judge-brand-name">ISKCON NRJD</span>
+        <span class="judge-brand-sub">Judge Panel</span>
+      </div>
     </div>
+    <div class="judge-user-area">
+      <!-- Messages badge (original) -->
+      <div class="msg-badge-wrap">
+        <button id="open-msg-btn" title="Messages from Admin" style="background:none;border:none;cursor:pointer;padding:6px;color:inherit;display:flex;align-items:center;gap:5px;font-size:13px;font-weight:500;opacity:.85;transition:.15s">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </button>
+        <span class="msg-badge" id="msg-badge">0</span>
+      </div>
+      <div class="judge-user-info">
+        <div class="judge-avatar"><%- (user.name||"J").charAt(0).toUpperCase() %></div>
+        <span class="judge-username"><%= user.name %></span>
+      </div>
+      <form method="post" action="/logout">
+        <button class="judge-logout-btn">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Logout
+        </button>
+      </form>
+    </div>
+  </header>
 
-    <script src="/js/judge.js"></script>
-  </body>
+  <!-- ════════════════════════════════════════════
+       DASHBOARD VIEW (original ID kept)
+  ════════════════════════════════════════════ -->
+  <main class="judge-main" id="dashboard-view">
+    <div class="judge-inner">
+
+      <!-- Welcome -->
+      <div class="welcome-section" style="margin-bottom:20px">
+        <h2>Welcome back, <span class="welcome-name"><%= user.name %></span>!</h2>
+        <p>Assigned to: <strong><%= assignedEvents.join(", ") || "No events yet" %></strong></p>
+      </div>
+
+      <!-- ── NEW: KPI Strip ── -->
+      <div class="j-kpi-strip" style="margin-bottom:20px">
+        <div class="j-kpi" style="animation-delay:.05s">
+          <div class="j-kpi-icon" style="background:rgba(249,115,22,.12);color:#fdba74">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          </div>
+          <div>
+            <div class="j-kpi-val" id="total-students">0</div>
+            <div class="j-kpi-lbl">Students</div>
+          </div>
+        </div>
+        <div class="j-kpi" style="animation-delay:.1s">
+          <div class="j-kpi-icon" style="background:rgba(34,197,94,.12);color:#4ade80">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div>
+            <div class="j-kpi-val" id="students-scored">0</div>
+            <div class="j-kpi-lbl">Scored by Me</div>
+          </div>
+        </div>
+        <div class="j-kpi" style="animation-delay:.15s">
+          <div class="j-kpi-icon" style="background:rgba(139,92,246,.12);color:#a78bfa">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+          </div>
+          <div>
+            <div class="j-kpi-val" id="kpi-avg">—</div>
+            <div class="j-kpi-lbl">Avg Score</div>
+          </div>
+        </div>
+        <div class="j-kpi" style="animation-delay:.2s">
+          <div class="j-kpi-icon" style="background:rgba(6,182,212,.12);color:#22d3ee">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <div>
+            <div class="j-kpi-val" id="completed">0</div>
+            <div class="j-kpi-lbl">Completed</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Two column layout ── -->
+      <div class="j-dash-cols">
+
+        <!-- LEFT: Room cards + original stat cards -->
+        <div>
+
+          <!-- ── NEW: Enhanced room cards ── -->
+          <% if(assignedRooms && assignedRooms.length > 0) { %>
+            <div class="j-section-head">
+              <div class="j-section-dot" style="background:#f97316"></div>
+              <h3>Your Room<% if(assignedRooms.length > 1) { %>s<% } %></h3>
+            </div>
+
+            <% assignedRooms.forEach(function(room, idx) {
+              const isClosed = room.status === 'closed';
+              const isReady  = !isClosed && room.judge_done;
+              const wrapCls  = isClosed ? 'j-room-closed' : isReady ? 'j-room-ready' : '';
+              const glow     = isClosed ? 'rgba(239,68,68,.05)' : isReady ? 'rgba(99,102,241,.07)' : 'rgba(249,115,22,.06)';
+              const stCls    = isClosed ? 'j-status-closed' : isReady ? 'j-status-ready' : 'j-status-open';
+              const stTxt    = isClosed ? 'Closed' : isReady ? 'Ready' : 'Open';
+            %>
+            <div class="j-room-card-wrap <%= wrapCls %>" id="jWrap-<%= room.id %>" style="animation-delay:<%= idx*0.08 %>s">
+              <div class="j-rc-head" style="--j-rc-glow:radial-gradient(ellipse at right,<%= glow %>,transparent 70%)">
+                <div class="j-rc-head-left">
+                  <div class="j-rc-icon"><%= room.room_number.charAt(0).toUpperCase() %></div>
+                  <div>
+                    <div class="j-rc-name">Room <%= room.room_number %></div>
+                    <div class="j-rc-event"><%= room.event_name %></div>
+                  </div>
+                </div>
+                <span class="j-status-badge <%= stCls %>">
+                  <span class="j-status-dot"></span><%= stTxt %>
+                </span>
+              </div>
+              <div class="j-rc-body">
+                <!-- Mini stats (populated by JS) -->
+                <div class="j-rc-mini-stats" id="jStats-<%= room.id %>">
+                  <div class="j-rc-mini-stat"><span class="j-rc-mini-val" style="font-size:15px">…</span><span class="j-rc-mini-lbl">Students</span></div>
+                  <div class="j-rc-mini-stat"><span class="j-rc-mini-val" style="font-size:15px;color:#4ade80">…</span><span class="j-rc-mini-lbl">Scored</span></div>
+                  <div class="j-rc-mini-stat"><span class="j-rc-mini-val" style="font-size:15px;color:#fdba74">…</span><span class="j-rc-mini-lbl">Avg</span></div>
+                </div>
+                <!-- Progress -->
+                <div>
+                  <div class="j-rc-prog-head" id="jProgHead-<%= room.id %>"><span>Progress</span><span>—%</span></div>
+                  <div class="j-rc-prog-track"><div class="j-rc-prog-fill" id="jProgFill-<%= room.id %>"></div></div>
+                </div>
+                <!-- Score dist -->
+                <div class="j-rc-dist" id="jDist-<%= room.id %>">
+                  <% [['#ef4444','0-20'],['#f97316','21-40'],['#eab308','41-60'],['#22c55e','61-80'],['#06b6d4','81+']].forEach(function(b){ %>
+                  <div class="j-rc-dist-col"><div class="j-rc-dist-bar" style="background:<%= b[0] %>;height:2px"></div><div class="j-rc-dist-lbl"><%= b[1] %></div></div>
+                  <% }) %>
+                </div>
+                <!-- Closed notice -->
+                <% if(isClosed) { %>
+                <div class="j-closed-notice">
+                  <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  Room closed by admin. Scoring locked.
+                </div>
+                <% } %>
+                <!-- Recent activity -->
+                <div class="j-rc-activity" id="jAct-<%= room.id %>">
+                  <div style="text-align:center;color:rgba(255,255,255,.2);font-size:10px;padding:6px">Loading...</div>
+                </div>
+                <!-- Actions -->
+                <div class="j-rc-actions">
+                  <button class="j-rc-btn j-rc-btn-start <%= isClosed ? '' : '' %>"
+                    onclick="jStartScoringRoom('<%= room.room_number %>','<%= room.event_name %>','<%= room.id %>')"
+                    id="jStartBtn-<%= room.id %>"
+                    <%= isClosed ? 'disabled' : '' %>>
+                    <% if(isClosed) { %>
+                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/></svg>
+                    Locked
+                    <% } else { %>
+                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+                    Start Scoring
+                    <% } %>
+                  </button>
+                  <button class="j-rc-btn j-rc-btn-detail" onclick="jToggleRoomDetail('<%= room.id %>')">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    Details
+                  </button>
+                </div>
+                <!-- Expandable student list -->
+                <div class="j-rc-detail" id="jDetail-<%= room.id %>">
+                  <div class="j-rc-detail-label">All Students</div>
+                  <div class="j-rc-student-list" id="jStudList-<%= room.id %>">
+                    <div style="color:rgba(255,255,255,.2);font-size:11px;text-align:center;padding:10px">Loading...</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <% }); %>
+
+            <!-- Historical closed rooms -->
+            <% if(histRooms && histRooms.length > 0) { %>
+            <div class="j-section-head" style="margin-top:8px">
+              <div class="j-section-dot" style="background:#64748b"></div>
+              <h3 style="color:rgba(255,255,255,.5)">Archived Rooms</h3>
+            </div>
+            <% histRooms.forEach(function(room, idx) { %>
+            <div class="j-room-card-wrap j-room-closed" style="opacity:.7;animation-delay:<%= idx*0.06 %>s">
+              <div class="j-rc-head">
+                <div class="j-rc-head-left">
+                  <div class="j-rc-icon" style="background:rgba(100,116,139,.2);color:#94a3b8"><%= room.room_number.charAt(0) %></div>
+                  <div>
+                    <div class="j-rc-name">Room <%= room.room_number %></div>
+                    <div class="j-rc-event"><%= room.event_name %></div>
+                  </div>
+                </div>
+                <span class="j-status-badge j-status-closed"><span class="j-status-dot"></span>Closed</span>
+              </div>
+              <div class="j-rc-body">
+                <div class="j-closed-notice">
+                  <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                  Scoring completed and archived.
+                </div>
+                <div class="j-rc-mini-stats" id="jStats-hist-<%= room.id %>">
+                  <div class="j-rc-mini-stat"><span class="j-rc-mini-val" style="font-size:15px">…</span><span class="j-rc-mini-lbl">Students</span></div>
+                  <div class="j-rc-mini-stat"><span class="j-rc-mini-val" style="font-size:15px;color:#4ade80">…</span><span class="j-rc-mini-lbl">Scored</span></div>
+                  <div class="j-rc-mini-stat"><span class="j-rc-mini-val" style="font-size:15px;color:#fdba74">…</span><span class="j-rc-mini-lbl">Avg</span></div>
+                </div>
+              </div>
+            </div>
+            <% }); %>
+            <% } %>
+
+          <% } else { %>
+            <!-- NO rooms — original no-events card -->
+            <div class="no-events">
+              <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <p>No events assigned yet. Contact your administrator.</p>
+            </div>
+          <% } %>
+
+          <!-- Help card -->
+          <div class="j-help-card">
+            <div class="j-help-icon">
+              <svg width="17" height="17" fill="none" stroke="#f87171" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div class="j-help-info">
+              <strong>Need help?</strong>
+              <p>Admin will be notified immediately.</p>
+            </div>
+            <button class="j-help-req-btn" onclick="jSendHelpRequest()">Request Help</button>
+          </div>
+        </div>
+
+        <!-- RIGHT: Activity + Messages + Summary -->
+        <div>
+          <!-- Activity feed -->
+          <div class="j-sidebar-card" style="animation-delay:.1s">
+            <div class="j-sidebar-head">
+              <h3>
+                <svg width="13" height="13" fill="none" stroke="#f97316" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                Recent Activity
+              </h3>
+              <span class="j-sidebar-badge" id="jActCount">0</span>
+            </div>
+            <div class="j-act-list" id="jActList">
+              <div style="padding:20px;text-align:center;color:rgba(255,255,255,.2);font-size:11px;display:flex;align-items:center;justify-content:center;gap:7px">
+                <div class="spin-sm"></div> Loading...
+              </div>
+            </div>
+          </div>
+
+          <!-- Messages (sidebar, new IDs — doesn't conflict with drawer) -->
+          <div class="j-sidebar-card" style="animation-delay:.15s">
+            <div class="j-sidebar-head">
+              <h3>
+                <svg width="13" height="13" fill="none" stroke="#a78bfa" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                Admin Messages
+                <span id="jSbMsgCount" style="background:rgba(239,68,68,.15);color:#f87171;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;display:none">0</span>
+              </h3>
+              <button onclick="jSbLoadMessages()" style="background:none;border:none;color:rgba(255,255,255,.3);font-size:10px;cursor:pointer;font-family:inherit">Refresh</button>
+            </div>
+            <div class="j-sb-msg-list" id="jSbMsgList">
+              <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:5px;color:rgba(255,255,255,.15)">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <span style="font-size:11px">No messages yet</span>
+              </div>
+            </div>
+            <div class="j-sb-send-row">
+              <input type="text" class="j-sb-input" id="jSbMsgInput" placeholder="Message admin..." maxlength="500"/>
+              <button class="j-sb-send-btn" onclick="jSbSendMessage()">Send</button>
+            </div>
+          </div>
+
+          <!-- Summary donut -->
+          <div class="j-sidebar-card" style="animation-delay:.2s">
+            <div class="j-sidebar-head"><h3>My Scoring Summary</h3></div>
+            <div class="j-summary-body" id="jSummaryBody">
+              <div style="text-align:center;color:rgba(255,255,255,.2);font-size:11px;padding:12px">Loading...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ════════════════════════════════════════════
+       SCORING VIEW (original structure — fully intact)
+  ════════════════════════════════════════════ -->
+  <div id="scoring-view" class="scoring-view hidden">
+    <div class="scoring-inner">
+      <div class="scoring-topbar">
+        <button id="back-to-dashboard" class="btn-back">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+          Back
+        </button>
+        <div class="scoring-title-wrap">
+          <h2 id="scoring-event-title">Event Name</h2>
+          <p id="scoring-event-subtitle">Room · Judge Panel</p>
+        </div>
+        <button id="close-room-btn" class="btn-close-room">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          Close Room
+        </button>
+      </div>
+      <div class="scoring-body">
+        <aside class="student-sidebar">
+          <div class="student-sidebar-header">
+            <h4 id="student-list-header">Students</h4>
+            <div class="progress-wrap">
+              <div class="progress-bg"><div id="student-progress-bar" class="progress-fill"></div></div>
+              <span id="student-progress-text" class="progress-label">0% scored</span>
+            </div>
+          </div>
+          <ul id="student-list-ul" class="student-list"></ul>
+        </aside>
+        <section class="score-panel">
+          <div id="scoring-panel" class="score-panel-inner">
+            <div class="score-placeholder">
+              <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <p>Select a student from the list to begin scoring.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /judge-layout -->
+
+<!-- ── ORIGINAL: Need Help button ── -->
+<button id="help-float-btn" title="Need Help? Contact Admin">
+  <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  Need Help?
+</button>
+
+<!-- ── ORIGINAL: Help modal ── -->
+<div id="help-modal">
+  <div id="help-modal-card">
+    <h3>
+      <svg width="20" height="20" fill="none" stroke="#6366f1" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Contact Admin for Help
+    </h3>
+    <p>Describe your issue. Admin will be notified immediately and can respond via Messages.</p>
+    <textarea id="help-msg-input" placeholder="e.g. Student not listed / scoring issue / technical problem..."></textarea>
+    <div class="help-modal-btns">
+      <button id="help-cancel-btn">Cancel</button>
+      <button id="help-send-btn">Send Request</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── ORIGINAL: Message drawer ── -->
+<div id="msg-drawer">
+  <div id="msg-drawer-header">
+    <span>
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Messages
+    </span>
+    <button id="close-msg-btn">&#x2715;</button>
+  </div>
+  <div id="msg-list"></div>
+  <div id="msg-input-row">
+    <input type="text" id="msg-input" placeholder="Reply to admin..."/>
+    <button id="msg-send-btn">Send</button>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div id="j-toast-cont"></div>
+
+<!-- Judge data for new JS functions -->
+<script>
+  window.JUDGE_DATA = {
+    judgeId:       <%= user.id %>,
+    judgeName:     "<%- (user.name||'').replace(/"/g,'&quot;') %>",
+    roomId:        <%= user.room_id || 'null' %>,
+    assignedRooms: <%- JSON.stringify(assignedRooms || []) %>,
+    histRooms:     <%- JSON.stringify(histRooms || []) %>,
+  };
+</script>
+<script src="/js/judge.js"></script>
+</body>
 </html>

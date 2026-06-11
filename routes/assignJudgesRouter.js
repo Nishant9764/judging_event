@@ -1,169 +1,149 @@
+// routes/assignJudgesRouter.js — Production Grade
+// FIX: ISKCON-themed password, professional email, single router
+"use strict";
 const express = require("express");
 const router = express.Router();
 const db = require("../config/db_admin");
 const bcrypt = require("bcrypt");
-const nodemailer = require("nodemailer");
+const {
+  generatePassword,
+  sendJudgeCredentials,
+} = require("../services/emailService");
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: "your-email@gmail.com",
-    pass: "", // 16 digits app password
-  },
-});
-
-function generateUsername(name) {
-  const base = (name || "judge")
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, "")
-    .slice(0, 12);
-  const suffix = Math.floor(100 + Math.random() * 900);
-  return `${base}${suffix}`;
+function requireAdmin(req, res, next) {
+  if (
+    req.session &&
+    req.session.user &&
+    req.session.user.role === "Administrator"
+  )
+    return next();
+  return res.status(403).json({ success: false, error: "Admins only." });
 }
 
-function generatePassword() {
-  const god = [
-    "Krishna",
-    "Radha",
-    "Jagannath",
-    "Prabhupada",
-    "Baladev",
-    "Subhadra",
-  ];
-  const godName = god[Math.floor(Math.random() * god.length)];
-  const randomNumber = Math.floor(1000 + Math.random() * 9000);
-  const symbols = "!@#$%^&*";
-  const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
-  return `${godName}${randomNumber}${randomSymbol}`;
-}
-
-// --- Send credentials via email ---
-async function sendCredentials(email, username, password) {
-  const mailOptions = {
-    from: "your-email@gmail.com",
-    to: email,
-    subject: "Judge Account Credentials",
-    html: `
-        <h3>Welcome!</h3>
-        <p>Your judge account has been created:</p>
-        <p><b>Username:</b> ${username}</p>
-        <p><b>Password:</b> ${password}</p>
-        <p>Please keep this information safe.</p>
-      `,
-  };
-
-  try {
-    await transporter.sendMail(mailOptions);
-    console.log("✅ Email sent to", email);
-  } catch (err) {
-    console.error("❌ Email sending failed:", err);
-  }
-}
-
-router.post("/assign", async (req, res) => {
+// POST /assign
+router.post("/assign", requireAdmin, async (req, res) => {
   const { judgeName, judgeEmail, roomNumber } = req.body;
 
-  if (!judgeName || !judgeEmail || !roomNumber)
-    return res.status(400).json({ error: "Missing required fields" });
+  if (!judgeName || !judgeEmail || !roomNumber) {
+    return res
+      .status(400)
+      .json({ success: false, error: "All fields are required." });
+  }
 
+  const conn = await db.getConnection();
   try {
-    // 1️⃣ Get Room Info
-    const [rooms] = await db.query(
-      "SELECT id, capacity FROM rooms WHERE room_number = ?",
-      [roomNumber]
-    );
-    if (!rooms.length) return res.status(400).json({ error: "Room not found" });
+    await conn.beginTransaction();
 
-    const roomId = rooms[0].id;
-    const capacity = rooms[0].capacity;
-
-    // 2️⃣ Count assigned judges in room
-    const [countRows] = await db.query(
-      'SELECT COUNT(*) AS cnt FROM users WHERE role="Judge" AND room_id=?',
-      [roomId]
+    // Lock room row — prevents race conditions
+    const [[room]] = await conn.query(
+      "SELECT id, event_name, capacity FROM rooms WHERE room_number = ? FOR UPDATE",
+      [roomNumber.trim()]
     );
-    if (countRows[0].cnt >= capacity)
+
+    if (!room) {
+      await conn.rollback();
       return res
-        .status(400)
-        .json({ error: "Room is full. Assign judge to a different room." });
+        .status(404)
+        .json({
+          success: false,
+          error: `Room "${roomNumber}" not found. Create it first.`,
+        });
+    }
 
-    // 3️⃣ Check if judge exists
-    const [existingUsers] = await db.query(
-      "SELECT * FROM users WHERE email=?",
-      [judgeEmail]
+    const [[{ judgeCount }]] = await conn.query(
+      "SELECT COUNT(*) AS judgeCount FROM users WHERE room_id = ? AND role = 'Judge'",
+      [room.id]
+    );
+    if (judgeCount >= (room.capacity || 3)) {
+      await conn.rollback();
+      return res
+        .status(409)
+        .json({
+          success: false,
+          error: `Room "${roomNumber}" is full (${judgeCount}/${
+            room.capacity || 3
+          }).`,
+        });
+    }
+
+    const [[existingJudge]] = await conn.query(
+      "SELECT id, name, room_id FROM users WHERE email = ? AND role = 'Judge'",
+      [judgeEmail.trim().toLowerCase()]
     );
 
-    if (existingUsers.length) {
-      const user = existingUsers[0];
+    let judgeId, plainPassword, isNew;
 
-      if (user.role !== "Judge")
-        return res
-          .status(400)
-          .json({ error: "Email belongs to a non-judge user" });
-
-      if (user.room_id === roomId)
-        return res
-          .status(400)
-          .json({ error: "Judge already assigned to this room" });
-
-      if (user.assignment_status === "pending")
-        return res.status(400).json({
-          error:
-            "Judge has a pending assignment in another room. Complete it before reassigning.",
-        });
-
-      // ✅ Assign existing judge to this room
-      await db.query(
-        "UPDATE users SET room_id=?, assigned_at=NOW(), assignment_status='pending' WHERE id=?",
-        [roomId, user.id]
+    if (existingJudge) {
+      judgeId = existingJudge.id;
+      isNew = false;
+      plainPassword = null;
+      await conn.query(
+        "UPDATE users SET room_id = ?, assignment_status = 'pending', name = ? WHERE id = ?",
+        [room.id, judgeName.trim(), judgeId]
       );
-
-      // Insert into history
-      await db.query(
-        "INSERT INTO judge_assignments_history (user_id, room_id) VALUES (?, ?)",
-        [user.id, roomId]
+    } else {
+      isNew = true;
+      // FIX: Use ISKCON-themed password generator
+      plainPassword = generatePassword();
+      const hashed = await bcrypt.hash(plainPassword, 10);
+      const [insertResult] = await conn.query(
+        `INSERT INTO users (name, email, password, role, room_id, assignment_status)
+         VALUES (?, ?, ?, 'Judge', ?, 'pending')`,
+        [judgeName.trim(), judgeEmail.trim().toLowerCase(), hashed, room.id]
       );
+      judgeId = insertResult.insertId;
+    }
 
-      // Send email with existing credentials (cannot decrypt password, so skip if hashed)
-      return res.json({
-        success: true,
-        message: "Existing judge assigned & history updated",
-        credentials: { username: user.name, password: "*****hidden*****" },
+    await conn.commit();
+
+    // Send credentials email asynchronously (don't block response)
+    if (isNew && plainPassword) {
+      sendJudgeCredentials({
+        email: judgeEmail.trim().toLowerCase(),
+        username: judgeName.trim(),
+        password: plainPassword,
+        roomNumber: roomNumber,
+        eventName: room.event_name,
+      }).then((r) => {
+        if (!r.sent) console.warn("[Assign] Email not sent:", r.reason);
       });
     }
 
-    // 4️⃣ Create new judge
-    const username = generateUsername(judgeName);
-    const password = generatePassword();
-    const hash = await bcrypt.hash(password, 10);
-
-    const [insertRes] = await db.query(
-      "INSERT INTO users (name, email, password, role, room_id, assigned_at) VALUES (?,?,?,?,?,NOW())",
-      [username, judgeEmail, hash, "Judge", roomId]
-    );
-
-    // Insert into history
-    await db.query(
-      "INSERT INTO judge_assignments_history (user_id, room_id) VALUES (?, ?)",
-      [insertRes.insertId, roomId]
-    );
-
-    // ======================================
-    // 5️⃣ Send credentials via email
-    // await sendCredentials(judgeEmail, username, password);
-    // ======================================
-
-    // 6️⃣ Return credentials for frontend card display
     return res.json({
       success: true,
-      message: "New judge created, assigned & email sent",
-      credentials: { username, password },
+      message: existingJudge
+        ? `Judge "${judgeName}" re-assigned to Room ${roomNumber}.`
+        : `Judge "${judgeName}" created and assigned to Room ${roomNumber}.`,
+      credentials: isNew
+        ? {
+            username: judgeName.trim(),
+            password: plainPassword,
+            email: judgeEmail.trim().toLowerCase(),
+            room: roomNumber,
+            note: "Credentials emailed. Share password securely if email fails.",
+          }
+        : {
+            username: existingJudge.name,
+            password: null,
+            note: "Existing judge re-assigned. Password unchanged.",
+          },
     });
   } catch (err) {
-    console.error("Assign Judge Error:", err);
+    await conn.rollback();
+    console.error("POST /assign error:", err);
+    if (err.code === "ER_DUP_ENTRY") {
+      return res
+        .status(409)
+        .json({
+          success: false,
+          error: "A judge with this email already exists.",
+        });
+    }
     return res
       .status(500)
-      .json({ error: "Server error while assigning judge" });
+      .json({ success: false, error: "Server error. Please try again." });
+  } finally {
+    conn.release();
   }
 });
 

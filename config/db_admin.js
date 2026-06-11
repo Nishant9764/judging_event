@@ -1,24 +1,14 @@
-// db_admin.js
-const mysql = require("mysql2");
+require("dotenv").config();
+const mysql = require("mysql2/promise");
 
-// create a promise-based pool
-const db = mysql
-  .createPool({
-    host: "localhost",
-    user: "root",
-    password: "QWERTY@54321",
-    database: "auth_db",
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0,
-  })
-  .promise(); // ✅ promise wrapper
-
-db.query("SELECT 1")
-  .then(() => console.log("✅ DB_ADMIN connected"))
-  .catch((err) => {
-    console.error("❌ DB_ADMIN connection failed:", err);
-    process.exit(1);
-  });
+const db = mysql.createPool({
+  host: process.env.DB_HOST || "localhost",
+  user: process.env.DB_USER || "root",
+  password: process.env.DB_PASS || "",
+  database: process.env.DB_NAME || "auth_db",
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+});
 
 module.exports = db;

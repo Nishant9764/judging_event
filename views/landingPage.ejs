@@ -3,77 +3,456 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ISKCON NRJD</title>
-    <link rel="stylesheet" href="CSS/landingPage.css" />
+    <title>ISKCON NRJD – Nandotsav Judging Portal</title>
+    <meta
+      name="description"
+      content="Official judging portal for ISKCON NRJD Nandotsav 2026 – secure, real-time student scoring and leaderboard management."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/CSS/landingPage.css" />
+    <style>
+      /* --- Hero redesign for spiritual visual --- */
+      .hero-inner {
+        position: relative;
+        max-width: 900px;
+        margin: 0 auto;
+        z-index: 2;
+        text-align: center;
+      }
+
+      /* Remove side logos */
+      .hero-logos {
+        display: none;
+      }
+
+      /* Central circular image */
+      .hero-center-image {
+        width: 220px;
+        height: 220px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 6px solid rgba(234, 179, 8, 0.7);
+        margin: 0 auto 32px;
+        transition: var(--transition);
+        box-shadow: 0 0 40px rgba(234, 179, 8, 0.6),
+          0 0 80px rgba(234, 179, 8, 0.3);
+      }
+      .hero-center-image:hover {
+        transform: scale(1.05);
+      }
+
+      /* Rotating Hare Krishna Mahamantra */
+      .mantra-rotation {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 380px;
+        height: 380px;
+        margin: -190px 0 0 -190px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: rotateMantra 25s linear infinite;
+        pointer-events: none;
+        z-index: 1;
+      }
+      .mantra-rotation span {
+        position: absolute;
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--saffron-light);
+        white-space: nowrap;
+        text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+      }
+
+      @keyframes rotateMantra {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Hero subtitle & desc adjustments */
+      .hero-subtitle {
+        font-size: clamp(14px, 2vw, 18px);
+        color: rgba(255, 255, 255, 0.75);
+        margin-bottom: 16px;
+      }
+      .hero-desc {
+        font-size: clamp(15px, 2vw, 18px);
+        max-width: 750px;
+        margin: 0 auto 40px;
+      }
+
+      /* Particles adjustment for softer glow */
+      .particle {
+        background: radial-gradient(circle, var(--gold), var(--saffron-light));
+      }
+
+      /* Smaller screens adjustments */
+      @media (max-width: 768px) {
+        .hero-center-image {
+          width: 180px;
+          height: 180px;
+        }
+        .mantra-rotation {
+          width: 280px;
+          height: 280px;
+          margin: -140px 0 0 -140px;
+        }
+        .title-hare {
+          font-size: 36px;
+        }
+        .title-krishna {
+          font-size: 30px;
+        }
+      }
+      @media (max-width: 480px) {
+        .hero-center-image {
+          width: 140px;
+          height: 140px;
+        }
+        .mantra-rotation {
+          width: 220px;
+          height: 220px;
+          margin: -110px 0 0 -110px;
+        }
+        .title-hare {
+          font-size: 28px;
+        }
+        .title-krishna {
+          font-size: 24px;
+        }
+      }
+    </style>
   </head>
   <body>
-    <div class="container">
-      <header class="header">
-        <div class="logo-left">
-          <div class="iskcon-logo">
-            <div class="lotus-symbol">
-              <img
-                src="/image/logo-left.jpg"
-                alt="ISKCON left Logo"
-                style="
-                  width: 100%;
-                  height: 100%;
-                  object-fit: contain;
-                  border-radius: 50%;
-                "
-              />
-            </div>
+    <div class="particles" id="particles"></div>
+
+    <nav class="navbar">
+      <div class="nav-inner">
+        <div class="nav-logos">
+          <div class="nav-logo-circle">
+            <img src="/image/logo-left.jpg" alt="ISKCON Logo" />
           </div>
+          <span class="nav-brand">ISKCON NRJD</span>
         </div>
-
-        <div class="title-section">
-          <h1 class="main-title">ISKCON NRJD</h1>
-          <h2 class="founder-title">
-            Founder - Acharya : His Divine Grace A.C. Bhaktivedanta Swami
-            Prabhupada
-          </h2>
-        </div>
-
-        <div class="logo-right">
-          <div class="prabhupada-image">
-            <div class="circular-frame">
-              <img
-                src="/image/logo-right.jpg"
-                alt="ISKCON Right Logo"
-                style="
-                  width: 100%;
-                  height: 100%;
-                  object-fit: contain;
-                  border-radius: 50%;
-                "
-              />
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <main class="main-content">
-        <!-- Glowing Central Image -->
-        <div class="central-image">
-          <img src="/image/central-photo.jpeg" alt="Central Divine Photo" />
-          <div class="aura"></div>
-        </div>
-
-        <!-- Hare Krishna Text -->
-        <div class="hare-krishna-text">
-          <span class="hare">HARE</span>
-          <span class="krishna">KRISHNA!!!</span>
-        </div>
-      </main>
-
-      <!-- Get Started Button -->
-      <div class="get-started">
-        <form action="/home" method="POST">
-          <button>Get Started</button>
-        </form>
+        <a href="/login" class="nav-cta">Login to Portal →</a>
       </div>
-    </div>
+    </nav>
 
-    <%- include('../partials/footer') %>
+    <!-- HERO SECTION -->
+    <section class="hero">
+      <div class="hero-inner">
+        <div class="hero-badge">
+          <span class="badge-dot"></span>
+          Nandotsav 2026 · Judging Portal
+        </div>
+
+        <!-- Rotating Mantra -->
+        <div class="mantra-rotation" id="mantra">
+          <!-- Span elements for mantra -->
+        </div>
+
+        <div class="hero-center-image glow-blue">
+          <img src="/image/central-photo.jpeg" alt="Central Divine" />
+        </div>
+
+        <h1 class="hero-title">
+          <span class="title-combo">
+            <span class="title-hare">ISKCON NRJD</span>
+            <span class="title-krishna">HARE KRISHNA</span>
+          </span>
+        </h1>
+        <p class="hero-subtitle">
+          Founder – Āchārya: His Divine Grace A.C. Bhaktivedanta Swami
+          Prabhupāda
+        </p>
+        <p class="hero-desc">
+          Welcome to the official digital judging platform for
+          <strong>ISKCON Nandotsav 2026</strong>.<br />
+          Secure, real-time scoring, room management, and live leaderboards —
+          all in one place.
+        </p>
+        <div class="hero-actions">
+          <a href="/login" class="btn-primary">
+            <svg
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+              <polyline points="10 17 15 12 10 7" />
+              <line x1="15" y1="12" x2="3" y2="12" />
+            </svg>
+            Sign In to Begin
+          </a>
+          <a href="#about" class="btn-ghost">Learn More ↓</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT SECTION -->
+    <section class="about" id="about">
+      <div class="section-inner">
+        <div class="section-label">About this Portal</div>
+        <h2 class="section-title">What is the ISKCON NRJD Judging Portal?</h2>
+        <p class="section-desc">
+          ISKCON NRJD Nandotsav is a grand cultural celebration where students
+          from various schools perform in events dedicated to Krishna. This
+          portal digitizes the entire judging process — from assigning judges to
+          rooms, to submitting scores and generating live leaderboards.
+        </p>
+        <div class="about-grid">
+          <div class="about-card">
+            <div class="about-icon">🏫</div>
+            <h3>Multi-School Event</h3>
+            <p>
+              Students from multiple schools compete across events, groups, and
+              classes — all tracked digitally.
+            </p>
+          </div>
+          <div class="about-card">
+            <div class="about-icon">⚖️</div>
+            <h3>Fair Judging</h3>
+            <p>
+              Each judge is securely assigned to a room. Scores are submitted
+              per parameter for full transparency.
+            </p>
+          </div>
+          <div class="about-card">
+            <div class="about-icon">📊</div>
+            <h3>Live Leaderboard</h3>
+            <p>
+              Admins see real-time scores and rankings as judges submit — no
+              manual tallying needed.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURES SECTION -->
+    <section class="features">
+      <div class="section-inner">
+        <div class="section-label">Features</div>
+        <h2 class="section-title">Everything you need, built in</h2>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon-wrap icon-blue">
+              <svg
+                width="22"
+                height="22"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <rect x="3" y="11" width="18" height="11" rx="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+            </div>
+            <h4>Secure Login</h4>
+            <p>
+              Role-based access for Administrators and Judges. Passwords
+              encrypted with bcrypt.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon-wrap icon-purple">
+              <svg
+                width="22"
+                height="22"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+            </div>
+            <h4>Judge Management</h4>
+            <p>
+              Create rooms, assign judges, auto-generate credentials, and track
+              assignment status.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon-wrap icon-orange">
+              <svg
+                width="22"
+                height="22"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+            </div>
+            <h4>CSV Student Import</h4>
+            <p>
+              Upload student rosters via CSV — auto-generates unique IDs and
+              populates the database instantly.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon-wrap icon-green">
+              <svg
+                width="22"
+                height="22"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+              </svg>
+            </div>
+            <h4>Live Scoring</h4>
+            <p>
+              Judges score students across multiple parameters. Results
+              aggregate instantly for admins.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon-wrap icon-pink">
+              <svg
+                width="22"
+                height="22"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <circle cx="12" cy="8" r="6" />
+                <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11" />
+              </svg>
+            </div>
+            <h4>Leaderboard</h4>
+            <p>
+              Real-time ranked results per event and group — filter, view, and
+              export results instantly.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon-wrap icon-teal">
+              <svg
+                width="22"
+                height="22"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <rect x="2" y="3" width="20" height="14" rx="2" />
+                <line x1="8" y1="21" x2="16" y2="21" />
+                <line x1="12" y1="17" x2="12" y2="21" />
+              </svg>
+            </div>
+            <h4>Admin Dashboard</h4>
+            <p>
+              Full overview of rooms, judges, students, events, and scores — all
+              from one control panel.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA SECTION -->
+    <section class="cta-section">
+      <div class="cta-inner">
+        <div class="cta-lotus">🪷</div>
+        <h2>Ready to begin judging?</h2>
+        <p>Sign in with your credentials to access the portal.</p>
+        <a href="/login" class="btn-primary btn-large">
+          <svg
+            width="18"
+            height="18"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+          >
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+            <polyline points="10 17 15 12 10 7" />
+            <line x1="15" y1="12" x2="3" y2="12" />
+          </svg>
+          Sign In to Portal
+        </a>
+        <p class="cta-sub">
+          Hare Krishna Hare Krishna · Krishna Krishna Hare Hare · Hare Rama Hare
+          Rama · Rama Rama Hare Hare
+        </p>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div class="footer-inner">
+        <div class="footer-logos">
+          <div class="footer-logo-circle">
+            <img src="/image/logo-left.jpg" alt="ISKCON" />
+          </div>
+          <div class="footer-logo-circle">
+            <img src="/image/logo-right.jpg" alt="NRJD" />
+          </div>
+        </div>
+        <p class="footer-title">ISKCON NRJD – Nandotsav 2026</p>
+        <p class="footer-sub">
+          Founder – Āchārya: His Divine Grace A.C. Bhaktivedanta Swami
+          Prabhupāda
+        </p>
+        <p class="footer-copy">© 2026 ISKCON NRJD. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      // Floating particles
+      const container = document.getElementById("particles");
+      for (let i = 0; i < 28; i++) {
+        const p = document.createElement("div");
+        p.className = "particle";
+        p.style.cssText = `
+          left: ${Math.random() * 100}%;
+          width: ${4 + Math.random() * 6}px;
+          height: ${4 + Math.random() * 6}px;
+          animation-delay: ${Math.random() * 12}s;
+          animation-duration: ${10 + Math.random() * 15}s;
+          opacity: ${0.15 + Math.random() * 0.4};
+        `;
+        container.appendChild(p);
+      }
+
+      // Scroll animations
+      const observer = new IntersectionObserver(
+        (entries) =>
+          entries.forEach(
+            (e) => e.isIntersecting && e.target.classList.add("visible")
+          ),
+        { threshold: 0.12 }
+      );
+      document
+        .querySelectorAll(
+          ".about-card, .feature-card, .section-title, .section-label, .section-desc, .cta-inner"
+        )
+        .forEach((el) => observer.observe(el));
+    </script>
   </body>
 </html>

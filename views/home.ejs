@@ -3,115 +3,346 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login</title>
-    <link rel="stylesheet" href="css/home.css" />
+    <title>Sign In – ISKCON NRJD Judging Portal</title>
+    <meta
+      name="description"
+      content="Sign in to access the ISKCON NRJD Nandotsav 2026 judging platform."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/CSS/home.css" />
   </head>
   <body>
-    <header class="top-header">
-      <div class="header-left">
-        <img src="/image/logo-left.jpg" alt="Left Logo" class="header-logo" />
-      </div>
-      <h1 class="header-title">ISKCON NRJD Nandotsav 2025</h1>
-      <div class="header-right">
-        <img src="/image/logo-right.jpg" alt="Right Logo" class="header-logo" />
-      </div>
-    </header>
+    <div class="login-layout">
+      <!-- ═══════════════════════════════
+           LEFT PANEL: Branding
+      ═══════════════════════════════ -->
+      <div class="brand-panel">
+        <div class="brand-particles" id="brandParticles"></div>
 
-    <section class="main-section">
-      <div class="container">
-        <!-- Header Section -->
-        <div class="header">
-          <p class="subtitle">Sign in to access the judging platform</p>
-        </div>
+        <div class="brand-content">
+          <!-- Mandala + Center Photo -->
+          <div class="brand-emblem">
+            <!-- Outer spinning mandala ring -->
+            <svg
+              class="brand-mandala"
+              viewBox="0 0 220 220"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle
+                cx="110"
+                cy="110"
+                r="104"
+                stroke="url(#mg1)"
+                stroke-width="1"
+                stroke-dasharray="6 4"
+              />
+              <circle
+                cx="110"
+                cy="110"
+                r="96"
+                stroke="url(#mg2)"
+                stroke-width="0.5"
+                stroke-dasharray="2 6"
+              />
+              <!-- 12 lotus petal tips -->
+              <g stroke="rgba(234,179,8,0.6)" stroke-width="0.8">
+                <line x1="110" y1="6" x2="110" y2="18" />
+                <line x1="155" y1="17" x2="148" y2="27" />
+                <line x1="193" y1="55" x2="183" y2="62" />
+                <line x1="204" y1="110" x2="192" y2="110" />
+                <line x1="193" y1="165" x2="183" y2="158" />
+                <line x1="155" y1="203" x2="148" y2="193" />
+                <line x1="110" y1="214" x2="110" y2="202" />
+                <line x1="65" y1="203" x2="72" y2="193" />
+                <line x1="27" y1="165" x2="37" y2="158" />
+                <line x1="16" y1="110" x2="28" y2="110" />
+                <line x1="27" y1="55" x2="37" y2="62" />
+                <line x1="65" y1="17" x2="72" y2="27" />
+              </g>
+              <!-- 8 diamond accents -->
+              <g fill="rgba(234,179,8,0.4)">
+                <polygon points="110,2 112,6 110,10 108,6" />
+                <polygon points="204,110 208,112 204,116 200,112" />
+                <polygon points="110,210 112,214 110,218 108,214" />
+                <polygon points="16,110 20,112 16,116 12,112" />
+                <polygon points="156,16 158,20 156,24 154,20" />
+                <polygon points="194,64 198,66 194,70 190,66" />
+                <polygon points="64,204 66,208 64,212 62,208" />
+                <polygon points="26,64 30,66 26,70 22,66" />
+              </g>
+              <defs>
+                <linearGradient
+                  id="mg1"
+                  x1="0"
+                  y1="0"
+                  x2="220"
+                  y2="220"
+                  gradientUnits="userSpaceOnUse"
+                >
+                  <stop offset="0%" stop-color="#eab308" stop-opacity="0.6" />
+                  <stop offset="50%" stop-color="#f97316" stop-opacity="0.4" />
+                  <stop offset="100%" stop-color="#eab308" stop-opacity="0.6" />
+                </linearGradient>
+                <linearGradient
+                  id="mg2"
+                  x1="0"
+                  y1="220"
+                  x2="220"
+                  y2="0"
+                  gradientUnits="userSpaceOnUse"
+                >
+                  <stop offset="0%" stop-color="#f97316" stop-opacity="0.3" />
+                  <stop offset="100%" stop-color="#eab308" stop-opacity="0.2" />
+                </linearGradient>
+              </defs>
+            </svg>
 
-        <% if (typeof error !== 'undefined') { %>
-          <script>alert("<%= error %>");</script>
-        <% } %>
+            <!-- Inner counter-spin ring -->
+            <svg
+              class="brand-mandala-counter"
+              viewBox="0 0 196 196"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle
+                cx="98"
+                cy="98"
+                r="92"
+                stroke="rgba(249,115,22,0.2)"
+                stroke-width="0.8"
+                stroke-dasharray="3 8"
+              />
+            </svg>
 
-        <!-- Form Container -->
-        <div class="form-container">
-          <div class="form-header">
-            <h2 class="form-title">Welcome</h2>
-            <p class="form-description">Enter your credentials to continue.</p>
+            <!-- Photo -->
+            <div class="brand-photo">
+              <img src="/image/central-photo.jpeg" alt="Central Divine" />
+            </div>
           </div>
 
-          <form class="form" action="/login" method="POST">
+          <!-- Eyebrow -->
+          <p class="brand-eyebrow">
+            Judging Portal &nbsp;·&nbsp; Nandotsav 2026
+          </p>
+
+          <!-- Org chip: ISKCON Magadi Main Road | NRJD — one line pill -->
+          <div class="brand-org-chip">
+            <span class="brand-org-chip-main">ISKCON Magadi Main Road</span>
+            <span class="brand-org-chip-sep"></span>
+            <span class="brand-org-chip-badge">NRJD</span>
+          </div>
+
+          <!-- Full name below chip -->
+          <p class="brand-name">New Rajapur Jagannatha Dham</p>
+
+          <!-- Big shimmer title -->
+          <h1 class="brand-nrjd-full">Nandotsav 2026</h1>
+
+          <!-- Decorative rule -->
+          <div class="brand-rule"><div class="brand-rule-diamond"></div></div>
+
+          <!-- Tagline — all in one line -->
+          <p class="brand-tagline">
+            Founder–Āchārya:
+            <em>His Divine Grace A.C. Bhaktivedanta Swami Prabhupāda</em>
+          </p>
+
+          <!-- Mantra -->
+          <div class="brand-mantra">
+            <span>Hare Krishna</span>
+            <!-- <span class="mantra-dot">·</span> -->
+            <!-- <span>Hare</span> -->
+          </div>
+        </div>
+
+        <!-- Footer with logos -->
+        <footer class="brand-footer">
+          <div class="brand-footer-logos">
+            <div class="brand-footer-logo">
+              <img src="/image/logo-left.jpg" alt="ISKCON Logo" />
+            </div>
+            <div class="brand-footer-logo-sep"></div>
+            <div class="brand-footer-logo">
+              <img src="/image/logo-right.jpg" alt="NRJD Logo" />
+            </div>
+          </div>
+          <div class="brand-footer-center">
+            <strong>ISKCON NRJD · Judging Portal</strong>
+            <p>Nandotsav Cultural Competition 2026</p>
+          </div>
+          <div class="brand-footer-live">Live&nbsp;Event</div>
+        </footer>
+      </div>
+
+      <!-- ═══════════════════════════════
+           RIGHT PANEL: Login Form
+      ═══════════════════════════════ -->
+      <div class="form-panel">
+        <div class="form-card">
+          <!-- Mobile header (hidden on desktop) -->
+          <div class="mobile-brand">
+            <div class="mobile-logo">
+              <img src="/image/logo-left.jpg" alt="ISKCON" />
+            </div>
+            <span>ISKCON NRJD · Nandotsav 2025</span>
+          </div>
+
+          <div class="form-header">
+            <h2>Welcome Back</h2>
+            <p>Sign in to access the judging portal</p>
+          </div>
+
+          <!-- Error Alert -->
+          <% if (error) { %>
+          <div class="alert-error" id="loginError">
+            <svg
+              width="16"
+              height="16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            <%= error %>
+          </div>
+          <% } %>
+
+          <form class="login-form" action="/login" method="POST" id="loginForm">
             <!-- Username -->
-            <div class="form-group">
-              <label class="form-label">Username</label>
-              <input
-                type="text"
-                id="username"
-                name="username"
-                class="form-input"
-                placeholder="Enter your username"
-                required
-              />
+            <div class="field-group">
+              <label for="username" class="field-label">Username</label>
+              <div class="field-wrap">
+                <span class="field-icon">
+                  <svg
+                    width="16"
+                    height="16"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </span>
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  class="field-input"
+                  placeholder="Enter your username"
+                  required
+                  autocomplete="username"
+                />
+              </div>
             </div>
 
             <!-- Password -->
-            <div class="form-group">
-              <label class="form-label">Password</label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                class="form-input"
-                placeholder="Enter your password"
-                required
-              />
-            </div>
-
-            <!-- Role Dropdown (custom) -->
-            <div class="form-group">
-              <label class="form-label">Role</label>
-              <div class="dropdown">
-                <button
-                  type="button"
-                  id="roleDropdownBtn"
-                  class="dropdown-button"
-                  onclick="toggleDropdown()"
-                >
-                  <div class="dropdown-content">
-                    <svg
-                      class="dropdown-icon"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.6 14.8,10.5V11.5C14.8,12.4 14.4,13.2 13.7,13.7L17.25,18H15.45L12,13.85L8.55,18H6.75L10.3,13.7C9.6,13.2 9.2,12.4 9.2,11.5V10.5C9.2,8.6 10.6,7 12,7Z"
-                      />
-                    </svg>
-                    <span class="dropdown-text" id="selectedRole"
-                      >Administrator</span
-                    >
-                  </div>
+            <div class="field-group">
+              <label for="password" class="field-label">Password</label>
+              <div class="field-wrap">
+                <span class="field-icon">
                   <svg
-                    class="dropdown-arrow"
-                    fill="currentColor"
+                    width="16"
+                    height="16"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
                     viewBox="0 0 24 24"
                   >
-                    <path d="M7 10l5 5 5-5z" />
+                    <rect x="3" y="11" width="18" height="11" rx="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
+                </span>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  class="field-input"
+                  placeholder="Enter your password"
+                  required
+                  autocomplete="current-password"
+                />
+                <button
+                  type="button"
+                  class="toggle-pw"
+                  id="togglePw"
+                  aria-label="Toggle password visibility"
+                >
+                  <svg
+                    id="eyeIcon"
+                    width="16"
+                    height="16"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
                   </svg>
                 </button>
-                <div id="roleDropdown" class="dropdown-menu dropdown-hidden">
-                  <button
-                    type="button"
-                    class="dropdown-item"
-                    onclick="selectRole('Administrator')"
-                  >
-                    Administrator
-                  </button>
-                  <button
-                    type="button"
-                    class="dropdown-item"
-                    onclick="selectRole('Judge')"
-                  >
-                    Judge
-                  </button>
-                </div>
               </div>
-              <!-- ✅ hidden input to submit role -->
+            </div>
+
+            <!-- Role Selection -->
+            <div class="field-group">
+              <label class="field-label">I am a</label>
+              <div class="role-selector">
+                <label class="role-option" id="roleAdmin">
+                  <input
+                    type="radio"
+                    value="Administrator"
+                    class="role-radio"
+                  />
+                  <div class="role-card">
+                    <div class="role-icon">
+                      <svg
+                        width="20"
+                        height="20"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="M12 1L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 1Z"
+                        />
+                      </svg>
+                    </div>
+                    <span>Administrator</span>
+                  </div>
+                </label>
+                <label class="role-option" id="roleJudge">
+                  <input type="radio" value="Judge" class="role-radio" />
+                  <div class="role-card">
+                    <div class="role-icon">
+                      <svg
+                        width="20"
+                        height="20"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                      </svg>
+                    </div>
+                    <span>Judge</span>
+                  </div>
+                </label>
+              </div>
               <input
                 type="hidden"
                 name="role"
@@ -120,46 +351,102 @@
               />
             </div>
 
-            <!-- Sign In -->
-            <button type="submit" class="sign-in-button">Sign In</button>
+            <button type="submit" class="submit-btn" id="submitBtn">
+              <span class="submit-text">Sign In</span>
+              <svg
+                width="18"
+                height="18"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                <polyline points="10 17 15 12 10 7" />
+                <line x1="15" y1="12" x2="3" y2="12" />
+              </svg>
+            </button>
           </form>
+
+          <p class="back-link"><a href="/">← Back to home</a></p>
         </div>
       </div>
-    </section>
-
-    <%- include('../partials/footer') %>
+    </div>
 
     <script>
-      let selectedRole = "Administrator";
+      (function () {
+        const roleInput = document.getElementById("roleInput");
+        if (!roleInput) return;
 
-      function toggleDropdown() {
-        const dropdown = document.getElementById("roleDropdown");
-        dropdown.classList.toggle("dropdown-hidden");
-        dropdown.classList.toggle("dropdown-visible");
-      }
+        document.querySelectorAll(".role-option").forEach(function (option) {
+          option.addEventListener("click", function () {
+            const radio = option.querySelector(".role-radio");
+            if (!radio) return;
+            document.querySelectorAll(".role-radio").forEach(function (r) {
+              r.checked = false;
+            });
+            document.querySelectorAll(".role-card").forEach(function (c) {
+              c.classList.remove("checked");
+            });
+            radio.checked = true;
+            option.querySelector(".role-card").classList.add("checked");
+            roleInput.value = radio.value;
+          });
+        });
 
-      function selectRole(role) {
-        selectedRole = role;
-        document.getElementById("selectedRole").textContent = role;
-
-        // ✅ update hidden input
-        document.getElementById("roleInput").value = role;
-
-        toggleDropdown();
-      }
-
-      // Close dropdown when clicking outside
-      document.addEventListener("click", function (event) {
-        const dropdown = document.getElementById("roleDropdown");
-        const dropdownBtn = document.getElementById("roleDropdownBtn");
-
-        if (
-          !dropdownBtn.contains(event.target) &&
-          !dropdown.contains(event.target)
-        ) {
-          if (!dropdown.classList.contains("dropdown-hidden")) toggleDropdown();
+        var adminRadio = document.querySelector(
+          '.role-radio[value="Administrator"]'
+        );
+        var adminCard = document.querySelector("#roleAdmin .role-card");
+        if (adminRadio) {
+          adminRadio.checked = true;
+          roleInput.value = "Administrator";
         }
-      });
+        if (adminCard) {
+          adminCard.classList.add("checked");
+        }
+
+        var pwInput = document.getElementById("password");
+        var togglePw = document.getElementById("togglePw");
+        var eyeIcon = document.getElementById("eyeIcon");
+        if (togglePw && pwInput && eyeIcon) {
+          togglePw.addEventListener("click", function () {
+            var isText = pwInput.type === "text";
+            pwInput.type = isText ? "password" : "text";
+            eyeIcon.innerHTML = isText
+              ? '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>'
+              : '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+          });
+        }
+
+        var bp = document.getElementById("brandParticles");
+        if (bp) {
+          for (var i = 0; i < 18; i++) {
+            var p = document.createElement("div");
+            p.className = "bp";
+            p.style.cssText =
+              "left:" +
+              Math.random() * 100 +
+              "%;" +
+              "width:" +
+              (3 + Math.random() * 5) +
+              "px;" +
+              "height:" +
+              (3 + Math.random() * 5) +
+              "px;" +
+              "animation-delay:" +
+              Math.random() * 10 +
+              "s;" +
+              "animation-duration:" +
+              (8 + Math.random() * 12) +
+              "s;" +
+              "opacity:" +
+              (0.1 + Math.random() * 0.3) +
+              ";";
+            bp.appendChild(p);
+          }
+        }
+      })();
     </script>
   </body>
 </html>
