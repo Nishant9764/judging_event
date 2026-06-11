@@ -107,10 +107,6 @@ Please keep commits small and focused. Add or update documentation as needed.
 
 Deploy to any Node-friendly host (Heroku, Vercel, Render, DigitalOcean). Ensure env vars are set and the correct build/start commands are used.
 
-## License
-
-Add a license to your project (e.g., MIT). If you already have one, update this section to reference it.
-
 ## Contact
 
 Maintainer: Nishant9764
