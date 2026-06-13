@@ -1,114 +1,85 @@
-# Judging Event
+# ISKCON Nandotsav - Event Judging Application
 
-A simple, user-friendly web application for managing judging events — built with Node.js, Express, and EJS templates. Use this project to create events, register entries and judges, collect scores, and calculate results.
+## Overview
+The ISKCON Nandotsav Judging Application is a comprehensive, role-based web platform built to streamline the evaluation process for large-scale school events and competitions. It digitizes the traditional paper-based scoring system, offering real-time leaderboards, dynamic room assignments, and seamless communication between administrators and judges.
 
-> Note: This README is intentionally general to match the project's current stack (JavaScript, EJS, CSS). Edit the instructions below to match any project-specific details (database, env vars, scripts) in your repository.
+## How It Helps the Organization
+- **Efficiency & Speed**: Eliminates manual data entry and score calculation. Judges input scores directly, and the system instantly updates leaderboards.
+- **Transparency & Accuracy**: Ensures standard evaluation parameters across all events. Reduces human error in tallying scores.
+- **Centralized Management**: Administrators can manage rooms, assign judges dynamically, and broadcast announcements from a single dashboard.
+- **Real-time Coordination**: Built-in messaging and help request features allow judges to instantly communicate with admins if they face issues in their assigned rooms.
 
-## Features
+## Tech Stack
+- **Backend**: Node.js, Express.js
+- **Frontend**: EJS (Embedded JavaScript) Templates, HTML, CSS, JavaScript
+- **Database**: MySQL (using `mysql2` driver)
+- **Authentication**: `bcrypt` for password hashing, `express-session` for session management
+- **Utilities**: `multer` & `csv-parser` for data import, `nodemailer` for email communications (if configured)
 
-- Create and manage judging events
-- Register entries and judges
-- Collect scores and comments
-- Calculate and display results
-- Simple, responsive UI using EJS and CSS
+## Key Features
+### Administrator Portal
+- **Dashboard & Analytics**: View real-time statistics, active rooms, and overall progress.
+- **Data Management**: Import students and events via CSV.
+- **Room & Judge Allocation**: Create judging rooms, set capacities, and assign/reassign judges to specific rooms on the fly.
+- **Leaderboard Generation**: Automatically calculate and display top performers based on submitted scores.
+- **Communications**: Broadcast announcements to all judges and respond to help requests.
 
-## Tech stack
+### Judge Portal
+- **Assigned Rooms**: View current room assignment and the list of students/groups to evaluate.
+- **Evaluation Form**: Score participants based on predefined event parameters (criteria) and max scores.
+- **Help Requests**: Instantly request assistance from the admin if an issue arises during an event.
+- **Status Updates**: Mark rooms as "done" once all evaluations are completed.
 
-- Node.js / Express
-- EJS templates
-- CSS for styling
-- (Optional) Any database you prefer (MongoDB, PostgreSQL, SQLite, etc.)
+## Database Schema Highlights
+The application relies on a structured relational database (`auth_db`):
+- `users`: Stores Admin and Judge credentials and roles.
+- `rooms`: Manages physical/virtual evaluation rooms and their statuses.
+- `events` & `event_parameters`: Defines the competitions and their specific grading criteria.
+- `schoolevents`: Stores the participants (students) and their group IDs.
+- `student_scores`: Maps the scores given by judges to students for specific parameters.
+- `announcements` & `messages`: Facilitates internal system communications.
 
-## Getting started
+## Setup and Installation
 
-### Prerequisites
+1. **Clone the repository:**
+   ```bash
+   git clone <repository-url>
+   cd Judging-application1
+   ```
 
-- Node.js (v14+ recommended)
-- npm or Yarn
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-### Installation
+3. **Environment Variables:**
+   Create a `.env` file in the root directory:
+   ```env
+   PORT=8080
+   DB_HOST=localhost
+   DB_USER=root
+   DB_PASS=your_password
+   DB_NAME=auth_db
+   SESSION_SECRET=your_secret_key
+   NODE_ENV=development
+   ```
 
-1. Clone the repo
+4. **Database Setup:**
+   - Ensure MySQL is running.
+   - Execute the SQL commands found in `Database.txt` to create the necessary tables and constraints.
+   - Run the seeder (if available) to populate initial admin accounts.
 
-```bash
-git clone https://github.com/Nishant9764/judging_event.git
-cd judging_event
-```
+5. **Run the Application:**
+   ```bash
+   # Development mode with nodemon
+   npm run dev
 
-2. Install dependencies
+   # Production mode
+   npm start
+   ```
 
-```bash
-npm install
-# or
-# yarn
-```
+6. **Access:**
+   Navigate to `http://localhost:8080` in your web browser.
 
-3. Create environment variables
-
-If your app requires environment variables (database connection, session secret, etc.), add a `.env` file in the project root. Example:
-
-```
-PORT=3000
-DATABASE_URL=your_database_connection_string
-SESSION_SECRET=replace_this_with_a_secret
-```
-
-4. Start the app
-
-```bash
-npm start
-# or for development with auto-reload
-# npm run dev
-```
-
-Open http://localhost:3000 in your browser.
-
-If there is a different start script in your `package.json`, use that instead (for example `npm run dev` or `node server.js`).
-
-## Project structure (example)
-
-- `app.js` / `server.js` - application entry point
-- `routes/` - Express routes
-- `views/` - EJS templates
-- `public/` - static CSS, images, client JS
-- `models/` - database models (if any)
-
-Adjust this section to reflect the actual layout of your repo.
-
-## Running tests
-
-If you have tests, run:
-
-```bash
-npm test
-```
-
-Add test instructions here if applicable.
-
-## Environment & Configuration
-
-- PORT: port to run the app (default: 3000)
-- DATABASE_URL: connection string for your DB (if used)
-- SESSION_SECRET: a secret key for sessions
-
-## Contributing
-
-Thanks for considering contributing!
-
-- Fork the repo
-- Create a branch: `git checkout -b feature/your-feature`
-- Make your changes and add tests
-- Commit and push: `git push origin feature/your-feature`
-- Open a pull request describing your changes
-
-Please keep commits small and focused. Add or update documentation as needed.
-
-## Deployment
-
-Deploy to any Node-friendly host (Heroku, Vercel, Render, DigitalOcean). Ensure env vars are set and the correct build/start commands are used.
-
-## Contact
-
-Maintainer: Nishant9764
-
-If you'd like the README to include more specific instructions (database setup, API routes, screenshots, or CI), tell me what details to fetch from the repository and I will incorporate them.
+## License
+ISC License
